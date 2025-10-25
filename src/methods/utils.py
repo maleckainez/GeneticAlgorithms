@@ -1,20 +1,20 @@
 # --> IMPORTS <--
 import os.path
-
+from pathlib import Path
 import numpy as np
 
 
-def load_data(path: str) -> dict:
+def load_data(path: str | Path) -> dict:
     """
     This module takes path to the file that contains data in format:
     <value> <weight>
     each line represents different item
     :param path: path to the text file containing data
-    :type path: str
+    :type path: (str | pathlib.Path)
     :return: dictionary {key: [value] [weight]}
     :rtype dict[int: list[int,int]]
     :raises FileNotFoundError: if the dile does not exist under the provided path
-    :raises ValueError: if file contains invalid of blank lines
+    :raises ValueError: if file is empty, contains letters, have missing data, or is wrongly formatted
     """
     if not os.path.exists(path):
         raise FileNotFoundError(f"File not found {path}")
@@ -22,10 +22,23 @@ def load_data(path: str) -> dict:
         lines = [line.strip() for line in f.readlines() if line.strip()]
         f.close()
     if not lines:
-        raise ValueError("File is empty or corrupted")
+        raise ValueError("File is empty")
     items = {}
-    for i in range(len(lines)):
-        items[i] = [int(x) for x in lines[i].split(" ")]
+    for i, line in enumerate(lines):
+        if not line.strip():
+            continue
+        parts = line.split()
+        if len(parts) != 2:
+            raise ValueError(
+                f"Invalid values on line {i+1}: expected 2 values, got {len(parts)}"
+            )
+        try:
+            value, weight = map(int, parts)
+        except ValueError:
+            raise ValueError(
+                f"Invalid values on line {i+1}: received non numeric input {line}"
+            )
+        items[i] = [value, weight]
     return items
 
 
