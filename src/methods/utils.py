@@ -11,9 +11,9 @@ def load_data(path: str | Path) -> dict:
     each line represents different item
     :param path: path to the text file containing data
     :type path: (str | pathlib.Path)
-    :return: dictionary {key: [value] [weight]}
+    :return: dictionary {key: [value, weight]}
     :rtype dict[int: list[int,int]]
-    :raises FileNotFoundError: if the dile does not exist under the provided path
+    :raises FileNotFoundError: if the file does not exist under the provided path
     :raises ValueError: if file is empty, contains letters, have missing data, or is wrongly formatted
     """
     if not os.path.exists(path):
@@ -25,8 +25,6 @@ def load_data(path: str | Path) -> dict:
         raise ValueError("File is empty")
     items = {}
     for i, line in enumerate(lines):
-        if not line.strip():
-            continue
         parts = line.split()
         if len(parts) != 2:
             raise ValueError(
