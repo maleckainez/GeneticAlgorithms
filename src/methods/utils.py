@@ -3,6 +3,10 @@ import os.path
 from pathlib import Path
 import numpy as np
 
+# -----------SEED-------------
+np.random.seed(2137)
+# ----------------------------
+
 
 def load_data(path: str | Path) -> dict:
     """
