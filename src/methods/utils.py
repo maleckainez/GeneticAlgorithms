@@ -44,8 +44,12 @@ def load_data(path: str | Path) -> dict:
     return items
 
 
+#   DEPRECATED
 def create_population(population_size: int, genome_length: int) -> np.ndarray:
     """
+    This function replaces the deprecated `create_population()` for improved
+    scalability and memory efficiency with large genome sizes.
+
     Generates an initial binary population for Genetic Algorithm.
     Each individual is a binary genome of length `genomeLength`.
 
@@ -58,3 +62,30 @@ def create_population(population_size: int, genome_length: int) -> np.ndarray:
      :rtype numpy ndarray of ints
     """
     return np.random.randint(2, size=(population_size, genome_length))
+
+
+def create_population_stream(
+    population_size: int, genome_length: int, stream_batch: int
+):
+    """
+    Lazily generates batches of binary genomes for a Genetic Algorithm population.
+
+    Each yielded batch is a 2D NumPy array of shape (batch_size, genome_length),
+    where batch_size ≤ stream_batch. This approach prevents allocating the entire
+    population in memory at once.
+
+    :param population_size: total number of individuals to generate
+    :type population_size: int
+    :param genome_length: number of genes per individual (usually number of items)
+    :type genome_length: int
+    :param stream_batch: number of individuals generated per iteration
+    :type stream_batch: int
+    :yield: NumPy array representing a batch of individuals (binary genomes)
+    :rtype: numpy.ndarray[uint8]
+    """
+    for pos in range(0, population_size, stream_batch):
+        yield np.random.randint(
+            2,
+            size=(min(stream_batch, population_size - pos), genome_length),
+            dtype=np.uint8,
+        )
