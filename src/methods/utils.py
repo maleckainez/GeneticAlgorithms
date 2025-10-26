@@ -3,10 +3,6 @@ import os.path
 from pathlib import Path
 import numpy as np
 
-# -----------SEED-------------
-np.random.seed(2137)
-# ----------------------------
-
 
 def load_data(path: str | Path) -> dict:
     """
@@ -64,28 +60,38 @@ def create_population(population_size: int, genome_length: int) -> np.ndarray:
     return np.random.randint(2, size=(population_size, genome_length))
 
 
-def create_population_stream(
-    population_size: int, genome_length: int, stream_batch: int
+def create_population_file(
+    population_size: int, genome_length: int, stream_batch: int, SEED: int
 ):
     """
-    Lazily generates batches of binary genomes for a Genetic Algorithm population.
+    Generates a binary population for a Genetic Algorithm in sequential batches
+    and writes it directly to a memory-mapped file ("population.dat") to avoid
+    storing the entire population in RAM.
 
-    Each yielded batch is a 2D NumPy array of shape (batch_size, genome_length),
-    where batch_size ≤ stream_batch. This approach prevents allocating the entire
-    population in memory at once.
+    Each batch is a 2D NumPy array of shape (batch_size, genome_length),
+    where batch_size ≤ stream_batch. Data are written to the file incrementally.
 
-    :param population_size: total number of individuals to generate
+    :param population_size: total number of individuals in the population
     :type population_size: int
-    :param genome_length: number of genes per individual (usually number of items)
+    :param genome_length: number of genes per individual
     :type genome_length: int
-    :param stream_batch: number of individuals generated per iteration
+    :param stream_batch: number of individuals generated per write iteration
     :type stream_batch: int
-    :yield: NumPy array representing a batch of individuals (binary genomes)
-    :rtype: numpy.ndarray[uint8]
+    :param SEED: seed for deterministic random number generation
+    :type SEED: int
+    :return: memory-mapped array referencing the generated population
+    :rtype: numpy.memmap
     """
-    for pos in range(0, population_size, stream_batch):
-        yield np.random.randint(
-            2,
-            size=(min(stream_batch, population_size - pos), genome_length),
-            dtype=np.uint8,
-        )
+    population = np.memmap(
+        "population.dat",
+        dtype=np.uint8,
+        mode="w+",
+        shape=(population_size, genome_length),
+    )
+    rng = np.random.default_rng(SEED)
+    for start in range(0, population_size, stream_batch):
+        stop = min(start + stream_batch, population_size)
+        batch = rng.integers(0, 2, size=(stop - start, genome_length), dtype=np.uint8)
+        population[start:stop] = batch
+        population.flush()
+    return population
