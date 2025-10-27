@@ -1,13 +1,21 @@
 import methods.utils
 import methods.fitness_score
+import numpy as np
+import os
+import json
 
 
 LARGE_SCALE_PATH_PREFIX = "../dane AG 2/large_scale/"
 LOW_DIMENSIONAL_PATH_PREFIX = "../dane AG 2/low-dimensional/"
-MAX_WEIGHT = 1000
+MAX_WEIGHT = 2500
 
 ITEMS_VALUE_WEIGHT = methods.utils.load_data(
     LOW_DIMENSIONAL_PATH_PREFIX + "f1_l-d_kp_10_269"
 )
-methods.utils.create_population_file(1000, len(ITEMS_VALUE_WEIGHT), 100, 2137)
-print(methods.fitness_score.calc_fitness_score(ITEMS_VALUE_WEIGHT, MAX_WEIGHT))
+
+methods.utils.create_population_file(100, len(ITEMS_VALUE_WEIGHT), 100, 2137)
+fitness = methods.fitness_score.calc_fitness_score(ITEMS_VALUE_WEIGHT, MAX_WEIGHT)
+# np.savetxt("fitness_preview.txt", fitness.astype(int), fmt="%d, %d", delimiter="")
+# for i in range(len(fitness)):
+#    if fitness[i][0] != 0:
+#        print(fitness[i])

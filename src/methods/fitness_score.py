@@ -6,7 +6,7 @@ import numpy as np
 from methods.utils import create_population
 
 
-def calc_fitness_score(ITEMS_VALUE_WEIGHT: dict, MAX_WEIGHT:int):
+def calc_fitness_score(ITEMS_VALUE_WEIGHT: dict, MAX_WEIGHT: int):
     required_files = ["population.dat", "population.json"]
     for file in required_files:
         if not os.path.exists(file):
@@ -22,23 +22,20 @@ def calc_fitness_score(ITEMS_VALUE_WEIGHT: dict, MAX_WEIGHT:int):
         config["filename"],
         dtype=config["data_type"],
         mode="r",
-        shape=(config["population_size"], config["genome_length"])
+        shape=(config["population_size"], config["genome_length"]),
     )
-    fitness_score = np.ndarray(shape=(config["population_size"],2), dtype=np.int64)
-    for row in range(population):
+    fitness_score = np.ndarray(shape=(config["population_size"], 2), dtype=np.int64)
+    for row in range(len(population)):
         weight = 0
         score = 0
         for gene in range(config["genome_length"]):
 
             if weight > MAX_WEIGHT:
-                temp_score = 0
+                score = 0
                 break
-            score += gene*ITEMS_VALUE_WEIGHT[gene][0]
-            weight += gene*ITEMS_VALUE_WEIGHT[gene][1]
-        fitness_score[row] = [score,weight]
+            score += int(population[row][gene]) * ITEMS_VALUE_WEIGHT[gene][0]
+            weight += int(population[row][gene]) * ITEMS_VALUE_WEIGHT[gene][1]
+        fitness_score[row] = [score, weight]
     return fitness_score
-
-
-
 
     return 0
