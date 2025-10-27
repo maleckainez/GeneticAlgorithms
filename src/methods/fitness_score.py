@@ -29,11 +29,13 @@ def calc_fitness_score(ITEMS_VALUE_WEIGHT: dict, MAX_WEIGHT: int):
         weight = 0
         score = 0
         for gene in range(config["genome_length"]):
-            if weight + int(population[row][gene]) * ITEMS_VALUE_WEIGHT[gene][1] > MAX_WEIGHT:
+            if (
+                weight + int(population[row][gene]) * ITEMS_VALUE_WEIGHT[gene][1]
+                > MAX_WEIGHT
+            ):
                 score = 0
                 break
             score += int(population[row][gene]) * ITEMS_VALUE_WEIGHT[gene][0]
             weight += int(population[row][gene]) * ITEMS_VALUE_WEIGHT[gene][1]
         fitness_score[row] = [score, weight]
     return fitness_score
-

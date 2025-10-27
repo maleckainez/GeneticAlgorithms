@@ -34,7 +34,7 @@ def load_data(path: str | Path) -> dict:
             value, weight = map(int, parts)
         except ValueError:
             raise ValueError(
-                f"Invalid values on line {i+1}: received non numeric input {line}"
+                f"Invalid values on line {i+1}: received non integer input {line}"
             )
         items[i] = [value, weight]
     return items

@@ -67,3 +67,13 @@ def test_not_not_enough_num_in_data(tmp_path):
         ValueError, match="Invalid values on line 3: expected 2 values, got 1"
     ):
         load_data(bad_data_file)
+
+
+def test_non_int_data(tmp_path):
+    bad_data_file = tmp_path / "float_data_file"
+    bad_data_file.write_text("\n30.1 4.0\n4.1 4.3\n 9.7 8.9 ")
+    with pytest.raises(
+        ValueError,
+        match="Invalid values on line 1: received non integer input 30.1 4.0",
+    ):
+        load_data(bad_data_file)
