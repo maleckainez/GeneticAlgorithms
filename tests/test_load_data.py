@@ -55,7 +55,7 @@ def test_letter_in_data(tmp_path):
     bad_data_file = tmp_path / "corrupted_data_file"
     bad_data_file.write_text("\n30 a\n4 4\n 9 0\n \n \n \n")
     with pytest.raises(
-        ValueError, match="Invalid values on line 1: received non numeric input 30 a"
+        ValueError, match="Invalid values on line 1: received non integer input 30 a"
     ):
         load_data(bad_data_file)
 

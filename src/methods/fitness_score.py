@@ -1,29 +1,11 @@
-import json
-import os.path
-
+# --> IMPORTS <--
 import numpy as np
+from methods import utils
 
-from methods.utils import create_population
 
-
+# --> FITNESS <--
 def calc_fitness_score(ITEMS_VALUE_WEIGHT: dict, MAX_WEIGHT: int):
-    required_files = ["population.dat", "population.json"]
-    for file in required_files:
-        if not os.path.exists(file):
-            raise FileNotFoundError(f"{file} does not exist")
-        if os.path.getsize(file) == 0:
-            raise ValueError(f"{file} is corrupted")
-    with open("population.json", "r") as conf_file:
-        config = json.load(conf_file)
-    if config["filesize"] != os.path.getsize(config["filename"]):
-        raise ValueError("File is corrupted")
-
-    population = np.memmap(
-        config["filename"],
-        dtype=config["data_type"],
-        mode="r",
-        shape=(config["population_size"], config["genome_length"]),
-    )
+    population, config = utils.load_memmap("population")
     fitness_score = np.ndarray(shape=(config["population_size"], 2), dtype=np.int64)
     for row in range(len(population)):
         weight = 0

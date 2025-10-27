@@ -5,6 +5,7 @@ import numpy as np
 import json
 
 
+# --> UTILS <--
 def load_data(path: str | Path) -> dict:
     """
     This function takes path to the file that contains data in format:
@@ -124,3 +125,47 @@ def create_memmap_config_json(
     }
     with open(filename + ".json", "w") as file:
         json.dump(config, file, indent=4)
+
+
+def load_memmap(config_filename: str | None = None, open_mode: str = "r"):
+    """
+    Load a memory-mapped NumPy array and its associated JSON configuration.
+
+    The function reads metadata from the .json file and validates the
+    corresponding .dat binary file before creating the memory map.
+    It returns both the opened NumPy memmap object and the loaded configuration
+    dictionary for downstream use in other functions.
+
+    :param config_filename: Base name of the JSON configuration file
+        (without extension). Defaults to "population".
+    :type config_filename: str or None
+    :param open_mode: File access mode ("r", "r+", or "w+").
+        Defaults to "r".
+    :type open_mode: str
+    :return: Tuple containing the memory-mapped array and configuration dictionary.
+    :rtype: tuple[numpy.memmap, dict]
+    :raises FileNotFoundError: If the JSON or data file does not exist.
+    :raises ValueError: If either file is empty or inconsistent with metadata.
+    """
+    if config_filename is None:
+        config_filename = "population"
+    config_path = config_filename + ".json"
+    if not os.path.exists(config_path):
+        raise FileNotFoundError(f"{config_path} does not exist")
+    if os.path.getsize(config_path) == 0:
+        raise ValueError(f"{config_path} is corrupted")
+    with open(config_path, "r") as conf_file:
+        config = json.load(conf_file)
+    dat_filename = config["filename"]
+    if not os.path.exists(dat_filename):
+        raise FileNotFoundError(f"{dat_filename} does not exist")
+    if config["filesize"] != os.path.getsize(dat_filename):
+        raise ValueError("File is corrupted")
+
+    data_file = np.memmap(
+        config["filename"],
+        dtype=config["data_type"],
+        mode=f"{open_mode}",
+        shape=(config["population_size"], config["genome_length"]),
+    )
+    return data_file, config
