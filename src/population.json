@@ -1,0 +1,7 @@
+{
+    "filename": "population.dat",
+    "data_type": "uint8",
+    "population_size": 10000,
+    "genome_length": 10001,
+    "filesize": 100010000
+}
