@@ -5,3 +5,7 @@
 *__pycache__*
 .idea
 .dat
+/src/.ipynb_checkpoints/__main__-checkpoint.py
+/src/methods/.ipynb_checkpoints/selection_methods-checkpoint.py
+*/.ipynb_checkpoints/
+/src/methods/.ipynb_checkpoints/

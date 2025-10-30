@@ -12,19 +12,25 @@ def fitness_proportionate_selection(
     )
     for i in range(config["population_size"]):
         fitness_sum += fitness_score[i][0]
+    if fitness_sum == 0:
+        for i in range(config["population_size"]):
+            fitness_sum += 1
+            fitness_score[i][0] = 1 
     for i in range(config["population_size"]):
         fitness_propotionate[i] = fitness_score[i][0] / fitness_sum
-    propotionate_cfd = np.cumulative_sum(fitness_propotionate.flatten())
+        print(f"index: {i}\n protionate: {fitness_propotionate[i]}")
+    propotionate_cfd = np.cumsum(fitness_propotionate.flatten())
     propotionate_cfd[-1] = 1
-
-    print(f"Population: \n {population}\n")
-    print(f"cfd: \n {propotionate_cfd}\n")
-    print("parent group: \n")
+    print(f"propotionate cfd: {propotionate_cfd}")
+    parent = []
     rng = np.random.default_rng(seed)
     for i in range(parent_group_size):
         r = rng.random()
         l = np.searchsorted(propotionate_cfd, r)
-        print(f"random value: {r}\n parent: {population[l]}")
+        print(f"random value: {r}\n parent index: {l}")
+        parent.append(l)
+    print(f"Indeksy rodziców:{parent}")
+
 
 
 
