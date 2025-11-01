@@ -1,6 +1,6 @@
 # --> IMPORTS <--
 import numpy as np
-from methods import utils
+from src.methods import utils
 
 
 # --> FITNESS <--
