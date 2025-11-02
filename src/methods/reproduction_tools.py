@@ -13,7 +13,10 @@ def parent_pairing(
 
 
 def single_crossover(
-    parent_pairs: np.ndarray[int], seed: int = 2137, cross_propab: float = 1
+    parent_pairs: np.ndarray[int],
+    seed: int = 2137,
+    cross_propab: float = 1,
+    mutation_probab: float = 0.1,
 ) -> None:
     rng = np.random.default_rng(seed)
     population, config = load_memmap("population")
@@ -30,16 +33,38 @@ def single_crossover(
         p2 = population[indx_p2]
         if rng.random() <= cross_propab:
             cut_place = rng.integers(0, config["genome_length"])
-            children[2 * i] = np.concatenate((p1[:cut_place], p2[cut_place:]))
-            children[(2 * i) + 1] = np.concatenate((p2[:cut_place], p1[cut_place:]))
+            children[2 * i] = mutation(
+                child=np.concatenate((p1[:cut_place], p2[cut_place:])),
+                mutation_probab=mutation_probab,
+                rng=rng,
+                genome_length=config["genome_length"],
+            )
+            children[(2 * i) + 1] = mutation(
+                child=np.concatenate((p2[:cut_place], p1[cut_place:])),
+                mutation_probab=mutation_probab,
+                rng=rng,
+                genome_length=config["genome_length"],
+            )
         else:
-            children[(2 * i)] = p1
-            children[(2 * i) + 1] = p2
+            children[(2 * i)] = mutation(
+                child=p1,
+                mutation_probab=mutation_probab,
+                rng=rng,
+                genome_length=config["genome_length"],
+            )
+            children[(2 * i) + 1] = mutation(
+                child=p2,
+                mutation_probab=mutation_probab,
+                rng=rng,
+                genome_length=config["genome_length"],
+            )
         children.flush()
 
     os.remove("population.dat")
     os.rename("children_temp.dat", "population.dat")
 
-def mutation():
-    raise NotImplementedError
-    # TODO: Simple implementation of bit flip
+
+def mutation(child, rng, genome_length: int, mutation_probab: float = 0.1):
+    mask = rng.random(genome_length) < mutation_probab
+    child[mask] = 1 - child[mask]
+    return child
