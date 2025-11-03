@@ -14,11 +14,11 @@ sys.path.insert(0, str(PROJECT_PATH / "src"))
 LARGE_SCALE_PATH = PROJECT_PATH / "dane AG 2" / "large_scale"
 LOW_DIMENSIONAL_PATH = PROJECT_PATH / "dane AG 2" / "low-dimensional"
 SEED = 2137
-MAX_WEIGHT = 2000
+MAX_WEIGHT = 20
 CROSSOVER_PROBABILITY = 1
 MUTATION_PROBABILITY = 0.1
-ITERATIONS = 500
-POPULATION_SIZE = int(1e5)
+ITERATIONS = 100
+POPULATION_SIZE = 20
 
 ITEMS_VALUE_WEIGHT = methods.utils.load_data(LOW_DIMENSIONAL_PATH / "f3_l-d_kp_4_20")
 methods.utils.create_population_file(
@@ -40,7 +40,12 @@ for i in range(ITERATIONS):
         mutation_probab=MUTATION_PROBABILITY,
     )
     fitness = methods.fitness_score.calc_fitness_score(ITEMS_VALUE_WEIGHT, MAX_WEIGHT)
-    print(f"iteration {i}: {fitness}")
+    best_idx = fitness[:, 0].argmax()
+    best_score, best_weight = fitness[best_idx]
+    print(
+        f"iter={i:03d} | best={best_score} (idx {best_idx}) | "
+        f"weight={best_weight} | avg={fitness[:, 0].mean():.1f}"
+    )
 
 
 files = ["population.dat", "population.json"]

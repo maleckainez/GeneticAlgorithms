@@ -20,7 +20,6 @@ def single_crossover(
 ) -> None:
     rng = np.random.default_rng(seed)
     population, config = load_memmap("population")
-    print(f"Population length: {len(population)}")
     children = np.memmap(
         "children_temp.dat",
         dtype=np.uint8,
