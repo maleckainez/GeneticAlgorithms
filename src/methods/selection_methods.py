@@ -3,7 +3,7 @@ from src.methods.utils import load_memmap
 
 
 def fitness_proportionate_selection(
-    fitness_score: np.ndarray, parent_group_size=5, seed=2137
+    fitness_score: np.ndarray, parent_group_size:int, seed:int=2137
 ) -> np.ndarray[int]:
     fitness_sum = 0
     population, config = load_memmap()

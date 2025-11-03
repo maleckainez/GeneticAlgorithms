@@ -30,7 +30,7 @@ methods.utils.create_population_file(
 fitness = methods.fitness_score.calc_fitness_score(ITEMS_VALUE_WEIGHT, MAX_WEIGHT)
 for i in range(ITERATIONS):
     parent_pool = methods.selection_methods.fitness_proportionate_selection(
-        fitness, parent_group_size=4, seed=SEED
+        fitness, parent_group_size=POPULATION_SIZE, seed=SEED
     )
     parent_pairs = parent_pairing(parent_pool)
     single_crossover(
