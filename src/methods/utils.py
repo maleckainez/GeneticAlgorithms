@@ -100,7 +100,7 @@ def create_population_file(
         rng = np.random.default_rng()
     for start in range(0, population_size, stream_batch):
         stop = min(start + stream_batch, population_size)
-        batch = ((rng.random(size=(stop - start, genome_length))<q).astype(np.uint8))
+        batch = (rng.random(size=(stop - start, genome_length)) < q).astype(np.uint8)
         population[start:stop] = batch
         population.flush()
     create_memmap_config_json("population", np.uint8, population_size, genome_length)

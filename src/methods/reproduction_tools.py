@@ -71,6 +71,9 @@ def mutation(
     mutation_probab: float = 0.1,
     rng: np.random.Generator | None = None,
 ):
+    child = np.array(child, copy=True)
+    if mutation_probab <= 0:
+        return child
     mask = rng.random(genome_length) < mutation_probab
     child[mask] = 1 - child[mask]
     return child

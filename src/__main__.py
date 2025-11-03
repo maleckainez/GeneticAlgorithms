@@ -16,19 +16,19 @@ PROJECT_PATH = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_PATH / "src"))
 LARGE_SCALE_PATH = PROJECT_PATH / "dane AG 2" / "large_scale"
 LOW_SCALE_PATH = PROJECT_PATH / "dane AG 2" / "low-dimensional"
-SEED = 2137
+SEED = None
 MAX_WEIGHT = 1000
-CROSSOVER_PROBABILITY = 1
+CROSSOVER_PROBABILITY = 0.8
 MUTATION_PROBABILITY = 0.1
-ITERATIONS = int(100)
-POPULATION_SIZE = int(1e5)
+ITERATIONS = int(1000)
+POPULATION_SIZE = int(10000)
 
 if SEED is not None:
     rng = np.random.default_rng(seed=SEED)
 else:
     rng = np.random.default_rng()
 ITEMS_VALUE_WEIGHT = methods.utils.load_data(LARGE_SCALE_PATH / "knapPI_2_100_1000_1")
-q = MAX_WEIGHT/ sum(ITEMS_VALUE_WEIGHT[i][1]for i in range(len(ITEMS_VALUE_WEIGHT)))
+q = MAX_WEIGHT / sum(ITEMS_VALUE_WEIGHT[i][1] for i in range(len(ITEMS_VALUE_WEIGHT)))
 methods.utils.create_population_file(
     population_size=POPULATION_SIZE,
     genome_length=len(ITEMS_VALUE_WEIGHT),
