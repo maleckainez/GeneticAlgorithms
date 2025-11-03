@@ -3,7 +3,9 @@ from src.methods.utils import load_memmap
 
 
 def fitness_proportionate_selection(
-    fitness_score: np.ndarray, parent_group_size: int, rng: np.random.Generator | None = None
+    fitness_score: np.ndarray,
+    parent_group_size: int,
+    rng: np.random.Generator | None = None,
 ) -> np.ndarray[int]:
     if rng is None:
         rng = np.random.default_rng()

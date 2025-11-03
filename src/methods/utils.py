@@ -65,6 +65,7 @@ def create_population_file(
     genome_length: int,
     stream_batch: int,
     rng: np.random.Generator | None = None,
+    q: float | None = None,
 ) -> None:
     """
     Generates a binary population for a Genetic Algorithm in sequential batches
@@ -93,11 +94,13 @@ def create_population_file(
         mode="w+",
         shape=(population_size, genome_length),
     )
+    if q is None:
+        q = 0.5
     if rng is None:
         rng = np.random.default_rng()
     for start in range(0, population_size, stream_batch):
         stop = min(start + stream_batch, population_size)
-        batch = rng.integers(0, 2, size=(stop - start, genome_length), dtype=np.uint8)
+        batch = ((rng.random(size=(stop - start, genome_length))<q).astype(np.uint8))
         population[start:stop] = batch
         population.flush()
     create_memmap_config_json("population", np.uint8, population_size, genome_length)
