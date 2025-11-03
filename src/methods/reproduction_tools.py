@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy
 import numpy as np
 import os
@@ -19,11 +21,15 @@ def single_crossover(
     cross_propab: float = 1,
     mutation_probab: float = 0.1,
 ) -> None:
+    PROJECT_ROOT = Path(__file__).resolve().parents[2]
+    TEMP = PROJECT_ROOT / "temp"
+    TEMP.mkdir(exist_ok=True)
+    CHILDREN_DAT = TEMP /"children_temp.dat"
     if rng is None:
         rng = np.random.default_rng()
     population, config = load_memmap("population")
     children = np.memmap(
-        "children_temp.dat",
+        CHILDREN_DAT,
         dtype=np.uint8,
         mode="w+",
         shape=(config["population_size"], config["genome_length"]),
@@ -61,8 +67,8 @@ def single_crossover(
             )
         children.flush()
 
-    os.remove("population.dat")
-    os.rename("children_temp.dat", "population.dat")
+    os.remove(config["filename"])
+    os.rename(CHILDREN_DAT, config["filename"])
 
 
 def mutation(

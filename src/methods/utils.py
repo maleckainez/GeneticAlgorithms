@@ -1,5 +1,6 @@
 # --> IMPORTS <--
 import os.path
+import shutil
 from pathlib import Path
 import numpy as np
 import json
@@ -88,8 +89,14 @@ def create_population_file(
     :return None
     :rtype None
     """
+    PROJECT_ROOT = Path(__file__).resolve().parents[2]
+    TEMP = PROJECT_ROOT / "temp"
+    TEMP.mkdir(exist_ok=True)
+    POPULATION_DAT = TEMP / "population.dat"
+    POPULATION_JSON = TEMP / "population.json"
+
     population = np.memmap(
-        "population.dat",
+        filename=POPULATION_DAT,
         dtype=np.uint8,
         mode="w+",
         shape=(population_size, genome_length),
@@ -103,18 +110,22 @@ def create_population_file(
         batch = (rng.random(size=(stop - start, genome_length)) < q).astype(np.uint8)
         population[start:stop] = batch
         population.flush()
-    create_memmap_config_json("population", np.uint8, population_size, genome_length)
+    create_memmap_config_json(
+        POPULATION_JSON, POPULATION_DAT, np.uint8, population_size, genome_length
+    )
 
 
 def create_memmap_config_json(
-    filename: str, datatype: type, population_size: int, genome_length
+    path: Path, dat_path: Path, datatype: type, population_size: int, genome_length
 ) -> None:
     """
     This function produces config json file for numpy.memmap.
     (This memmap data files are saved as raw binary files with no information about size, or data types)
 
-    :param filename: filename without ".dat" extension
-    :type filename: str
+    :param path: path to the json config file
+    :type path: Path
+    :param dat_path: path to the .dat file
+    :type dat_path: Path
     :param datatype: numpy datatype used in the memmap file (it has to be converted onto string)
     :type datatype: numpy.dtype
     :param population_size: number of lines in the file (x dimension)
@@ -124,13 +135,13 @@ def create_memmap_config_json(
     :return: None
     """
     config = {
-        "filename": filename + ".dat",
+        "filename": str(dat_path),
         "data_type": np.dtype(datatype).name,
         "population_size": population_size,
         "genome_length": genome_length,
-        "filesize": population_size * genome_length,  # file weight in bytes
+        "filesize": population_size * genome_length,
     }
-    with open(filename + ".json", "w") as file:
+    with open(path, "w") as file:
         json.dump(config, file, indent=4)
 
 
@@ -154,25 +165,37 @@ def load_memmap(config_filename: str | None = None, open_mode: str = "r"):
     :raises FileNotFoundError: If the JSON or data file does not exist.
     :raises ValueError: If either file is empty or inconsistent with metadata.
     """
+    PROJECT_ROOT = Path(__file__).resolve().parents[2]
+    TEMP = PROJECT_ROOT / "temp"
+    TEMP.mkdir(exist_ok=True)
     if config_filename is None:
         config_filename = "population"
-    config_path = config_filename + ".json"
-    if not os.path.exists(config_path):
+
+    config_path = TEMP / (config_filename + ".json")
+
+    if not config_path.exists():
         raise FileNotFoundError(f"{config_path} does not exist")
-    if os.path.getsize(config_path) == 0:
+    if config_path.stat().st_size == 0:
         raise ValueError(f"{config_path} is corrupted")
+
     with open(config_path, "r") as conf_file:
         config = json.load(conf_file)
-    dat_filename = config["filename"]
-    if not os.path.exists(dat_filename):
-        raise FileNotFoundError(f"{dat_filename} does not exist")
-    if config["filesize"] != os.path.getsize(dat_filename):
+
+    dat_path = Path(config["filename"])
+    if not dat_path.exists():
+        raise FileNotFoundError(f"{dat_path} does not exist")
+    if config["filesize"] != dat_path.stat().st_size:
         raise ValueError("File is corrupted")
 
     data_file = np.memmap(
-        config["filename"],
+        dat_path,
         dtype=config["data_type"],
         mode=f"{open_mode}",
         shape=(config["population_size"], config["genome_length"]),
     )
     return data_file, config
+
+def clear_temp_files():
+    PROJECT_ROOT = Path(__file__).resolve().parents[2]
+    TEMP_PATH = PROJECT_ROOT / "temp"
+    shutil.rmtree(TEMP_PATH)

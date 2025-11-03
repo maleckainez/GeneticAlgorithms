@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from pathlib import Path
-from src.methods.utils import load_data, create_population_file
+from src.methods.utils import load_data, create_population_file, clear_temp_files
 from src.methods.fitness_score import calc_fitness_score
 from src.methods.selection_methods import fitness_proportionate_selection
 from src.methods.reproduction_tools import single_crossover, parent_pairing
@@ -20,7 +20,7 @@ SEED = 1111
 MAX_WEIGHT = 1000
 CROSSOVER_PROBABILITY = 0.8
 MUTATION_PROBABILITY = 0.1
-ITERATIONS = int(1e6)
+ITERATIONS = int(50)
 POPULATION_SIZE = int(1e2)
 PENALTY_PERCENTAGE = 1
 #################################################################################
@@ -68,8 +68,4 @@ for i in range(ITERATIONS):
     )
     print(f"iteration {i}")
 
-files = ["population.dat", "population.json"]
-for file in files:
-    if os.path.exists(file):
-        os.remove(file)
-        print(f"removed {file}")
+clear_temp_files()
