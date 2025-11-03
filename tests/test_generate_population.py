@@ -1,18 +1,18 @@
 import json
 import os
-
 import numpy as np
-from methods.utils import create_population_file
-from methods.utils import load_data
+from src.methods.utils import create_population_file
+from src.methods.utils import load_data
 
 SEED = 2137
+rng = np.random.default_rng(SEED)
 
 
 def test_create_population_basic():
     population_size = 2500
     genome_length = 100
     batch = 500
-    create_population_file(population_size, genome_length, batch, SEED)
+    create_population_file(population_size, genome_length, batch, rng=rng)
     population = np.memmap(
         "population.dat",
         dtype=np.uint8,
@@ -44,7 +44,7 @@ def test_create_population_big_width():
     population_size = 1000
     genome_length = int(1e6)
     batch = 500
-    create_population_file(population_size, genome_length, batch, SEED)
+    create_population_file(population_size, genome_length, batch, rng)
     population = np.memmap(
         "population.dat",
         dtype=np.uint8,
@@ -75,7 +75,7 @@ def test_create_population_big_pop():
     population_size = int(1e6)
     genome_length = 1000
     batch = 500
-    create_population_file(population_size, genome_length, batch, SEED)
+    create_population_file(population_size, genome_length, batch, rng)
     population = np.memmap(
         "population.dat",
         dtype=np.uint8,
@@ -106,7 +106,7 @@ def test_json_and_real_data():
     PATH = "../dane AG 2/large_scale/knapPI_1_100_1000_1"
     POPSIZE = 1000
     GENOME_LENGTH = len(load_data(PATH))
-    create_population_file(1000, GENOME_LENGTH, 100, 2137)
+    create_population_file(1000, GENOME_LENGTH, 100, rng)
     with open("population.json", "r") as f:
         cfg = json.load(f)
 

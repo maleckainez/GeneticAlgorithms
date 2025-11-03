@@ -2,19 +2,19 @@ import numpy
 import numpy as np
 import os
 
-from src.methods.utils import load_memmap, create_memmap_config_json
+from src.methods.utils import load_memmap
 
 
 def parent_pairing(
     parent_pool: numpy.ndarray[int], rng: np.random.Generator | None = None
-) -> np.ndarray[int]:
+) -> np.ndarray[tuple[int, int]]:
     if rng is None:
         rng = np.random.default_rng()
     return rng.permutation(parent_pool).reshape(-1, 2)
 
 
 def single_crossover(
-    parent_pairs: np.ndarray[int],
+    parent_pairs: np.ndarray[tuple[int, int]],
     rng: np.random.Generator | None = None,
     cross_propab: float = 1,
     mutation_probab: float = 0.1,
