@@ -3,8 +3,10 @@ from src.methods.utils import load_memmap
 
 
 def fitness_proportionate_selection(
-    fitness_score: np.ndarray, parent_group_size:int, seed:int=2137
+    fitness_score: np.ndarray, parent_group_size: int, rng: np.random.Generator | None = None
 ) -> np.ndarray[int]:
+    if rng is None:
+        rng = np.random.default_rng()
     fitness_sum = 0
     population, config = load_memmap()
     fitness_propotionate = np.ndarray(
@@ -20,7 +22,7 @@ def fitness_proportionate_selection(
         fitness_propotionate[i] = fitness_score[i][0] / fitness_sum
     propotionate_cfd = np.cumsum(fitness_propotionate.flatten())
     propotionate_cfd[-1] = 1
-    r = np.random.default_rng(seed).random(parent_group_size)
+    r = rng.random(parent_group_size)
     return np.searchsorted(propotionate_cfd, r).tolist()
 
 

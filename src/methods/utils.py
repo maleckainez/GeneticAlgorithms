@@ -61,7 +61,10 @@ def create_population(population_size: int, genome_length: int) -> np.ndarray:
 
 
 def create_population_file(
-    population_size: int, genome_length: int, stream_batch: int, SEED: int
+    population_size: int,
+    genome_length: int,
+    stream_batch: int,
+    rng: np.random.Generator | None = None,
 ) -> None:
     """
     Generates a binary population for a Genetic Algorithm in sequential batches
@@ -79,8 +82,8 @@ def create_population_file(
     :type genome_length: int
     :param stream_batch: number of individuals generated per write iteration
     :type stream_batch: int
-    :param SEED: seed for deterministic random number generation
-    :type SEED: int
+    :param rng: previously created RNG with predefined seed for deterministic random number generation
+    :type rng: np.random.Generator | None
     :return None
     :rtype None
     """
@@ -90,7 +93,8 @@ def create_population_file(
         mode="w+",
         shape=(population_size, genome_length),
     )
-    rng = np.random.default_rng(SEED)
+    if rng is None:
+        rng = np.random.default_rng()
     for start in range(0, population_size, stream_batch):
         stop = min(start + stream_batch, population_size)
         batch = rng.integers(0, 2, size=(stop - start, genome_length), dtype=np.uint8)

@@ -1,4 +1,7 @@
 import sys
+
+import numpy as np
+
 import methods.utils
 import methods.fitness_score
 import methods.selection_methods
@@ -20,22 +23,23 @@ MUTATION_PROBABILITY = 0.1
 ITERATIONS = 100
 POPULATION_SIZE = 20
 
+rng = np.random.default_rng(seed=SEED)
 ITEMS_VALUE_WEIGHT = methods.utils.load_data(LOW_DIMENSIONAL_PATH / "f3_l-d_kp_4_20")
 methods.utils.create_population_file(
     population_size=POPULATION_SIZE,
     genome_length=len(ITEMS_VALUE_WEIGHT),
     stream_batch=500,
-    SEED=SEED,
+    rng=rng,
 )
 fitness = methods.fitness_score.calc_fitness_score(ITEMS_VALUE_WEIGHT, MAX_WEIGHT)
 for i in range(ITERATIONS):
     parent_pool = methods.selection_methods.fitness_proportionate_selection(
-        fitness, parent_group_size=POPULATION_SIZE, seed=SEED
+        fitness, parent_group_size=POPULATION_SIZE, rng=rng
     )
     parent_pairs = parent_pairing(parent_pool)
     single_crossover(
         parent_pairs,
-        seed=SEED,
+        rng=rng,
         cross_propab=CROSSOVER_PROBABILITY,
         mutation_probab=MUTATION_PROBABILITY,
     )
