@@ -199,3 +199,26 @@ def clear_temp_files():
     PROJECT_ROOT = Path(__file__).resolve().parents[2]
     TEMP_PATH = PROJECT_ROOT / "temp"
     shutil.rmtree(TEMP_PATH)
+
+def log_output(
+        iter: int | None = None, 
+        bestidx: int | None = None,
+        fitness: int | None = None,
+        weight: int | None = None,
+        message: str | None = None,
+        path: Path = Path(__file__).resolve().parents[2]
+        ):
+    
+    with open(path/"output.log", 'a+') as output:
+        if iter or bestidx or fitness or weight is not None:
+            output.writelines(f"Iteration {iter}:\n" 
+                            f"      index:{bestidx}\n" 
+                            f"      fitness: {fitness}\n"
+                            f"      weight: {weight}\n")
+        if message is not None:
+            output.writelines(f"Additional message: {message}\n")
+    if bestidx is not None:
+        population,_ = load_memmap()
+        with open(path/"best_chromosomes.log", 'a+') as best_chomosomes:
+            best_chomosomes.writelines(f"Best chromosome for iteration {iter} with fitness {fitness}:\n {population[bestidx]}\n")
+        population._mmap.close()
