@@ -222,3 +222,17 @@ def log_output(
         with open(path/"best_chromosomes.log", 'a+') as best_chomosomes:
             best_chomosomes.writelines(f"Best chromosome for iteration {iter} with fitness {fitness}:\n {population[bestidx]}\n")
         population._mmap.close()
+
+def final_screen():
+    print(  r""" 
+           ______      __           __      __  _           
+          / ____/___ _/ /______  __/ /___ _/ /_(_)___  ____  
+         / /   / __ `/ / ___/ / / / / __ `/ __/ / __ \/ __ \ 
+        / /___/ /_/ / / /__/ /_/ / / /_/ / /_/ / /_/ / / / / 
+        \____/\__,_/_/\___/\__,_/_/\__,_/\__/_/\____/_/ /_/  
+            _______       _      __             __   __     
+           / ____(_)___  (_)____/ /_  ___  ____/ /  / /     
+          / /_  / / __ \/ / ___/ __ \/ _ \/ __  /  / /     
+         / __/ / / / / / (__  ) / / /  __/ /_/ /  /_/       
+        /_/   /_/_/ /_/_/____/_/ /_/\___/\__,_/  (_)        
+                                                            """)

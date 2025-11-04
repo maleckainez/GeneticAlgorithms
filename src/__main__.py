@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from pathlib import Path
-from src.methods.utils import load_data, create_population_file, clear_temp_files, log_output
+from src.methods.utils import load_data, create_population_file, clear_temp_files, log_output, final_screen
 from src.methods.fitness_score import calc_fitness_score
 from src.methods.selection_methods import fitness_proportionate_selection
 from src.methods.reproduction_tools import single_crossover, parent_pairing
@@ -86,16 +86,5 @@ for i in range(1,ITERATIONS+1):
     )
     print(f"Finished calculating iteration {i}")
 
-print(  r""" 
-           ______      __           __      __  _           
-          / ____/___ _/ /______  __/ /___ _/ /_(_)___  ____  
-         / /   / __ `/ / ___/ / / / / __ `/ __/ / __ \/ __ \ 
-        / /___/ /_/ / / /__/ /_/ / / /_/ / /_/ / /_/ / / / / 
-        \____/\__,_/_/\___/\__,_/_/\__,_/\__/_/\____/_/ /_/  
-            _______       _      __             __   __     
-           / ____(_)___  (_)____/ /_  ___  ____/ /  / /     
-          / /_  / / __ \/ / ___/ __ \/ _ \/ __  /  / /     
-         / __/ / / / / / (__  ) / / /  __/ /_/ /  /_/       
-        /_/   /_/_/ /_/_/____/_/ /_/\___/\__,_/  (_)        
-                                                            """)
+final_screen()
 clear_temp_files()
