@@ -67,6 +67,8 @@ def single_crossover(
             )
         children.flush()
 
+    population._mmap.close()
+    children._mmap.close()
     os.remove(config["filename"])
     os.rename(CHILDREN_DAT, config["filename"])
 
