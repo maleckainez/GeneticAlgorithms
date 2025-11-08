@@ -1,10 +1,18 @@
-import os
 import numpy as np
 from pathlib import Path
-from src.methods.utils import load_data, create_population_file, clear_temp_files, log_output, final_screen
+from src.methods.utils import (
+    load_data,
+    create_population_file,
+    clear_temp_files,
+    log_output,
+    final_screen,
+)
 from src.methods.fitness_score import calc_fitness_score
 from src.methods.selection_methods import fitness_proportionate_selection
-from src.methods.reproduction_tools import single_crossover, parent_pairing
+from src.methods.reproduction_tools import (
+    single_crossover,
+    parent_pairing
+)
 
 
 #############################################################################
@@ -32,18 +40,21 @@ else:
 
 value_weight_dict = load_data(path=LARGE_SCALE_PATH / FILENAME)
 
-propab_q = MAX_WEIGHT / sum(
+probability_of_failure = MAX_WEIGHT / sum(
     value_weight_dict[i][1] for i in range(len(value_weight_dict))
 )
 log_output(
-    message=str("Population initialized with probability treshold 'q' ="+ str(propab_q))
+    message=str(
+        "Population initialized with probability of failure threshold 'q' ="
+        + str(probability_of_failure)
+    )
 )
 create_population_file(
     population_size=POPULATION_SIZE,
     genome_length=len(value_weight_dict),
     stream_batch=500,
     rng=rng,
-    q=propab_q,
+    probability_of_failure=probability_of_failure,
 )
 
 fitness = calc_fitness_score(
@@ -53,13 +64,15 @@ fitness = calc_fitness_score(
 )
 best_idx = fitness[:, 0].argmax()
 best_score, weight = fitness[best_idx]
-log_output(iter=0,
-           bestidx= best_idx,
-           fitness= best_score,
-           weight= weight,
-           message= str("Population created successfully as iteration " + str(iter)))
+log_output(
+    iteration=0,
+    best_genome_index=best_idx,
+    fitness=best_score,
+    weight=weight,
+    message=str("Population created successfully as iteration " + str(iter)),
+)
 
-for i in range(1,ITERATIONS+1):
+for i in range(1, ITERATIONS + 1):
     parent_pool = fitness_proportionate_selection(
         fitness_score=fitness, parent_group_size=POPULATION_SIZE, rng=rng
     )
@@ -67,8 +80,8 @@ for i in range(1,ITERATIONS+1):
     single_crossover(
         parent_pairs=parent_pairs,
         rng=rng,
-        cross_propab=CROSSOVER_PROBABILITY,
-        mutation_probab=MUTATION_PROBABILITY,
+        crossover_probability=CROSSOVER_PROBABILITY,
+        mutation_probability=MUTATION_PROBABILITY,
     )
     fitness = calc_fitness_score(
         value_weight_dict=value_weight_dict,
@@ -79,10 +92,7 @@ for i in range(1,ITERATIONS+1):
     best_idx = fitness[:, 0].argmax()
     best_score, weight = fitness[best_idx]
     log_output(
-        iter=i,
-        bestidx=best_idx,
-        fitness=best_score,
-        weight=weight
+        iteration=i, best_genome_index=best_idx, fitness=best_score, weight=weight
     )
     print(f"Finished calculating iteration {i}")
 

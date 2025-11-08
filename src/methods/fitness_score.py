@@ -5,6 +5,7 @@ from src.methods import utils
 
 # --> FITNESS <--
 def calc_fitness_score(value_weight_dict: dict, max_weight: int, penalty: float = 1):
+    # TODO: docstrings
     population, config = utils.load_memmap("population")
     fitness_score = np.ndarray(shape=(config["population_size"], 2), dtype=np.int64)
     for row in range(len(population)):

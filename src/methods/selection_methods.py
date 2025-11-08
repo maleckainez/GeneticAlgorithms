@@ -6,12 +6,13 @@ def fitness_proportionate_selection(
     fitness_score: np.ndarray,
     parent_group_size: int,
     rng: np.random.Generator | None = None,
-) -> np.ndarray[int]:
+) -> list[int]:
+    # TODO: docstrings
     if rng is None:
         rng = np.random.default_rng()
     fitness_sum = 0
     population, config = load_memmap()
-    fitness_propotionate = np.ndarray(
+    fitness_proportionate = np.ndarray(
         shape=(config["population_size"], 1), dtype=np.float64
     )
     for i in range(config["population_size"]):
@@ -21,11 +22,11 @@ def fitness_proportionate_selection(
             fitness_sum += 1
             fitness_score[i][0] = 1
     for i in range(config["population_size"]):
-        fitness_propotionate[i] = fitness_score[i][0] / fitness_sum
-    propotionate_cfd = np.cumsum(fitness_propotionate.flatten())
-    propotionate_cfd[-1] = 1
+        fitness_proportionate[i] = fitness_score[i][0] / fitness_sum
+    proportionate_cfd = np.cumsum(fitness_proportionate.flatten())
+    proportionate_cfd[-1] = 1
     r = rng.random(parent_group_size)
-    return np.searchsorted(propotionate_cfd, r).tolist()
+    return np.searchsorted(proportionate_cfd, r).tolist()
 
 
 def tournament_selection():

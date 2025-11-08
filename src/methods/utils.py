@@ -66,29 +66,9 @@ def create_population_file(
     genome_length: int,
     stream_batch: int,
     rng: np.random.Generator | None = None,
-    q: float | None = None,
+    probability_of_failure: float | None = None,
 ) -> None:
-    """
-    Generates a binary population for a Genetic Algorithm in sequential batches
-    and writes it directly to a memory-mapped file ("population.dat") to avoid
-    storing the entire population in RAM.
-
-    Also generates json file to make population more readable and accessible.
-
-    Each batch is a 2D NumPy array of shape (batch_size, genome_length),
-    where batch_size ≤ stream_batch (logical requirement). Data are written to the file incrementally.
-
-    :param population_size: total number of individuals in the population
-    :type population_size: int
-    :param genome_length: number of genes per individual
-    :type genome_length: int
-    :param stream_batch: number of individuals generated per write iteration
-    :type stream_batch: int
-    :param rng: previously created RNG with predefined seed for deterministic random number generation
-    :type rng: np.random.Generator | None
-    :return None
-    :rtype None
-    """
+    # TODO: docstrings
     PROJECT_ROOT = Path(__file__).resolve().parents[2]
     TEMP = PROJECT_ROOT / "temp"
     TEMP.mkdir(exist_ok=True)
@@ -101,13 +81,15 @@ def create_population_file(
         mode="w+",
         shape=(population_size, genome_length),
     )
-    if q is None:
-        q = 0.5
+    if probability_of_failure is None:
+        probability_of_failure = 0.5
     if rng is None:
         rng = np.random.default_rng()
     for start in range(0, population_size, stream_batch):
         stop = min(start + stream_batch, population_size)
-        batch = (rng.random(size=(stop - start, genome_length)) < q).astype(np.uint8)
+        batch = (
+            rng.random(size=(stop - start, genome_length)) < probability_of_failure
+        ).astype(np.uint8)
         population[start:stop] = batch
         population.flush()
     create_memmap_config_json(
@@ -118,22 +100,7 @@ def create_population_file(
 def create_memmap_config_json(
     path: Path, dat_path: Path, datatype: type, population_size: int, genome_length
 ) -> None:
-    """
-    This function produces config json file for numpy.memmap.
-    (This memmap data files are saved as raw binary files with no information about size, or data types)
-
-    :param path: path to the json config file
-    :type path: Path
-    :param dat_path: path to the .dat file
-    :type dat_path: Path
-    :param datatype: numpy datatype used in the memmap file (it has to be converted onto string)
-    :type datatype: numpy.dtype
-    :param population_size: number of lines in the file (x dimension)
-    :type population_size: int
-    :param genome_length: number of bytes in one line (y dimension)
-    :type genome_length: int
-    :return: None
-    """
+    # TODO: docstrings
     config = {
         "filename": str(dat_path),
         "data_type": np.dtype(datatype).name,
@@ -146,25 +113,7 @@ def create_memmap_config_json(
 
 
 def load_memmap(config_filename: str | None = None, open_mode: str = "r"):
-    """
-    Load a memory-mapped NumPy array and its associated JSON configuration.
-
-    The function reads metadata from the .json file and validates the
-    corresponding .dat binary file before creating the memory map.
-    It returns both the opened NumPy memmap object and the loaded configuration
-    dictionary for downstream use in other functions.
-
-    :param config_filename: Base name of the JSON configuration file
-        (without extension). Defaults to "population".
-    :type config_filename: str or None
-    :param open_mode: File access mode ("r", "r+", or "w+").
-        Defaults to "r".
-    :type open_mode: str
-    :return: Tuple containing the memory-mapped array and configuration dictionary.
-    :rtype: tuple[numpy.memmap, dict]
-    :raises FileNotFoundError: If the JSON or data file does not exist.
-    :raises ValueError: If either file is empty or inconsistent with metadata.
-    """
+    # TODO: docstrings
     PROJECT_ROOT = Path(__file__).resolve().parents[2]
     TEMP = PROJECT_ROOT / "temp"
     TEMP.mkdir(exist_ok=True)
@@ -186,45 +135,54 @@ def load_memmap(config_filename: str | None = None, open_mode: str = "r"):
         raise FileNotFoundError(f"{dat_path} does not exist")
     if config["filesize"] != dat_path.stat().st_size:
         raise ValueError("File is corrupted")
-
     data_file = np.memmap(
-        dat_path,
+        filename=dat_path,
         dtype=config["data_type"],
-        mode=f"{open_mode}",
+        mode=open_mode,
         shape=(config["population_size"], config["genome_length"]),
     )
     return data_file, config
 
+
 def clear_temp_files():
+    # TODO: docstrings
     PROJECT_ROOT = Path(__file__).resolve().parents[2]
     TEMP_PATH = PROJECT_ROOT / "temp"
     shutil.rmtree(TEMP_PATH)
 
+
 def log_output(
-        iter: int | None = None, 
-        bestidx: int | None = None,
-        fitness: int | None = None,
-        weight: int | None = None,
-        message: str | None = None,
-        path: Path = Path(__file__).resolve().parents[2]
-        ):
-    
-    with open(path/"output.log", 'a+') as output:
-        if iter or bestidx or fitness or weight is not None:
-            output.writelines(f"Iteration {iter}:\n" 
-                            f"      index:{bestidx}\n" 
-                            f"      fitness: {fitness}\n"
-                            f"      weight: {weight}\n")
+    # TODO: Depreciate, use python logging library, avoid opening population in every iteration -> time and memory consuming!
+    iteration: int | None = None,
+    best_genome_index: int | None = None,
+    fitness: int | None = None,
+    weight: int | None = None,
+    message: str | None = None,
+    path: Path = Path(__file__).resolve().parents[2],
+):
+
+    with open(path / "output.log", "a+") as output:
+        if iteration or best_genome_index or fitness or weight is not None:
+            output.writelines(
+                f"Iteration {iteration}:\n"
+                f"      index:{best_genome_index}\n"
+                f"      fitness: {fitness}\n"
+                f"      weight: {weight}\n"
+            )
         if message is not None:
             output.writelines(f"Additional message: {message}\n")
-    if bestidx is not None:
-        population,_ = load_memmap()
-        with open(path/"best_chromosomes.log", 'a+') as best_chomosomes:
-            best_chomosomes.writelines(f"Best chromosome for iteration {iter} with fitness {fitness}:\n {population[bestidx]}\n")
+    if best_genome_index is not None:
+        population, _ = load_memmap()
+        with open(path / "best_chromosomes.log", "a+") as best_chromosomes:
+            best_chromosomes.writelines(
+                f"Best chromosome for iteration {iteration} with fitness {fitness}:\n {population[best_genome_index]}\n"
+            )
         population._mmap.close()
 
+
 def final_screen():
-    print(  r""" 
+    print(
+        r""" 
            ______      __           __      __  _           
           / ____/___ _/ /______  __/ /___ _/ /_(_)___  ____  
          / /   / __ `/ / ___/ / / / / __ `/ __/ / __ \/ __ \ 
@@ -235,4 +193,5 @@ def final_screen():
           / /_  / / __ \/ / ___/ __ \/ _ \/ __  /  / /     
          / __/ / / / / / (__  ) / / /  __/ /_/ /  /_/       
         /_/   /_/_/ /_/_/____/_/ /_/\___/\__,_/  (_)        
-                                                            """)
+                                                            """
+    )
