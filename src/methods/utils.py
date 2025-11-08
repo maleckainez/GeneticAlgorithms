@@ -118,8 +118,7 @@ def create_memmap_config_json(
 
 
 def load_memmap(
-    filename_constant: str | None = None,
-    open_mode: str = "r"
+    filename_constant: str | None = None, open_mode: str = "r"
 ) -> tuple[np.memmap, dict[str, any]]:
     # TODO: docstrings
     temp = find_temp_directory()
@@ -186,10 +185,12 @@ def log_output(
         if message is not None:
             output.writelines(f"Additional message: {message}\n")
     if genome is not None:
-        with open(path / f"chromosomes_{filename_constant}.log", "a+") as best_chromosomes:
+        with open(
+            path / f"chromosomes_{filename_constant}.log", "a+"
+        ) as best_chromosomes:
             if fitness > 0:
 
-                genome="".join(str(i) for i in genome.tolist())
+                genome = "".join(str(i) for i in genome.tolist())
                 best_chromosomes.writelines(
                     f"Best chromosome for iteration {iteration} with fitness {fitness}:\n {genome}\n"
                 )

@@ -1,16 +1,17 @@
 import re
 
+
 def create_unique_experiment_name(
-        filename: str,
-        population_length:int,
-        genome_width:int,
-        number_of_generations: int,
-        crossover: float,
-        mutation: float,
-        exp_no:int
+    filename: str,
+    population_length: int,
+    genome_width: int,
+    number_of_generations: int,
+    crossover: float,
+    mutation: float,
+    exp_no: int,
 ) -> str:
-    cr = re.sub(r'\.','p',f"{crossover}")
-    mr = re.sub(r'\.','p',f"{mutation}")
+    cr = re.sub(r"\.", "p", f"{crossover}")
+    mr = re.sub(r"\.", "p", f"{mutation}")
     fname = re.sub("[^A-Za-z0-9]+", "", filename)
     parts = [
         fname,
@@ -21,5 +22,5 @@ def create_unique_experiment_name(
         f"MR{mr}",
         f"EXP{exp_no:03d}",
     ]
-    unique_id = '-'.join(parts)
+    unique_id = "-".join(parts)
     return unique_id

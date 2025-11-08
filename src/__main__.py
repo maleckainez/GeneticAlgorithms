@@ -10,8 +10,13 @@ from src.methods.utils import (
 )
 from src.methods.fitness_score import calc_fitness_score
 from src.methods.selection_methods import fitness_proportionate_selection
-from src.methods.reproduction_tools import single_crossover, parent_pairing
+from src.methods.reproduction_tools import (
+    single_crossover,
+    parent_pairing,
+    single_crossover_batched,
+)
 from src.methods.experiment_defining_tools import create_unique_experiment_name
+
 #############################################################################
 PROJECT_PATH = Path(__file__).resolve().parent.parent
 LARGE_SCALE_PATH = PROJECT_PATH / "dane AG 2" / "large_scale"
@@ -28,7 +33,7 @@ MUTATION_PROBABILITY = 0.001
 ITERATIONS = int(100)
 POPULATION_SIZE = int(1e5)
 PENALTY_PERCENTAGE = 1
-EXPERIMENT_NO=1
+EXPERIMENT_NO = 1
 #################################################################################
 
 try:
@@ -50,7 +55,7 @@ try:
         number_of_generations=ITERATIONS,
         crossover=CROSSOVER_PROBABILITY,
         mutation=MUTATION_PROBABILITY,
-        exp_no= EXPERIMENT_NO
+        exp_no=EXPERIMENT_NO,
     )
 
     create_population_file(
@@ -70,7 +75,9 @@ try:
         ),
     )
 
-    population_file_handle, population_file_config = load_memmap(filename_constant=experiment_name)
+    population_file_handle, population_file_config = load_memmap(
+        filename_constant=experiment_name
+    )
     fitness = calc_fitness_score(
         value_weight_dict=value_weight_dict,
         max_weight=MAX_WEIGHT,
@@ -92,7 +99,9 @@ try:
 except Exception as e:
     log_output(message=str(e))
 for i in range(1, ITERATIONS + 1):
-    population_file_handle, population_file_config = load_memmap(filename_constant=experiment_name)
+    population_file_handle, population_file_config = load_memmap(
+        filename_constant=experiment_name
+    )
     parent_pool = fitness_proportionate_selection(
         fitness_score=fitness,
         parent_group_size=POPULATION_SIZE,
@@ -100,7 +109,7 @@ for i in range(1, ITERATIONS + 1):
         population_file_config=population_file_config,
     )
     parent_pairs = parent_pairing(parent_pool=parent_pool, rng=rng)
-    single_crossover(
+    single_crossover_batched(
         parent_pairs=parent_pairs,
         rng=rng,
         crossover_probability=CROSSOVER_PROBABILITY,
@@ -124,7 +133,7 @@ for i in range(1, ITERATIONS + 1):
         best_genome_index=best_idx,
         fitness=best_score,
         weight=weight,
-        genome=population_file_handle[best_idx]
+        genome=population_file_handle[best_idx],
     )
     print(f"Finished calculating iteration {i}")
 
