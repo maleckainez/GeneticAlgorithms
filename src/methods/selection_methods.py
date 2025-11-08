@@ -5,11 +5,9 @@ from src.methods.utils import load_memmap
 def fitness_proportionate_selection(
     fitness_score: np.ndarray,
     parent_group_size: int,
-    rng: np.random.Generator | None = None,
+    rng: np.random.Generator,
 ) -> list[int]:
-    # TODO: docstrings
-    if rng is None:
-        rng = np.random.default_rng()
+    # TODO: docstring
     fitness_sum = 0
     population, config = load_memmap()
     fitness_proportionate = np.ndarray(

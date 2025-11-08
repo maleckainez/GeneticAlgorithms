@@ -61,20 +61,24 @@ def create_population(population_size: int, genome_length: int) -> np.ndarray:
     return np.random.randint(2, size=(population_size, genome_length))
 
 
+def find_temp_directory():
+    PROJECT_ROOT = Path(__file__).resolve().parents[2]
+    TEMP = PROJECT_ROOT / "temp"
+    TEMP.mkdir(exist_ok=True)
+    return TEMP
+
+
 def create_population_file(
     population_size: int,
     genome_length: int,
     stream_batch: int,
-    rng: np.random.Generator | None = None,
+    rng: np.random.Generator,
     probability_of_failure: float | None = None,
 ) -> None:
     # TODO: docstrings
-    PROJECT_ROOT = Path(__file__).resolve().parents[2]
-    TEMP = PROJECT_ROOT / "temp"
-    TEMP.mkdir(exist_ok=True)
+    TEMP = find_temp_directory()
     POPULATION_DAT = TEMP / "population.dat"
     POPULATION_JSON = TEMP / "population.json"
-
     population = np.memmap(
         filename=POPULATION_DAT,
         dtype=np.uint8,
@@ -83,8 +87,6 @@ def create_population_file(
     )
     if probability_of_failure is None:
         probability_of_failure = 0.5
-    if rng is None:
-        rng = np.random.default_rng()
     for start in range(0, population_size, stream_batch):
         stop = min(start + stream_batch, population_size)
         batch = (
@@ -114,9 +116,7 @@ def create_memmap_config_json(
 
 def load_memmap(config_filename: str | None = None, open_mode: str = "r"):
     # TODO: docstrings
-    PROJECT_ROOT = Path(__file__).resolve().parents[2]
-    TEMP = PROJECT_ROOT / "temp"
-    TEMP.mkdir(exist_ok=True)
+    TEMP = find_temp_directory()
     if config_filename is None:
         config_filename = "population"
 
@@ -146,9 +146,9 @@ def load_memmap(config_filename: str | None = None, open_mode: str = "r"):
 
 def clear_temp_files():
     # TODO: docstrings
-    PROJECT_ROOT = Path(__file__).resolve().parents[2]
-    TEMP_PATH = PROJECT_ROOT / "temp"
-    shutil.rmtree(TEMP_PATH)
+    TEMP = find_temp_directory()
+    if TEMP.exists():
+        shutil.rmtree(TEMP)
 
 
 def log_output(

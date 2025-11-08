@@ -9,11 +9,7 @@ from src.methods.utils import (
 )
 from src.methods.fitness_score import calc_fitness_score
 from src.methods.selection_methods import fitness_proportionate_selection
-from src.methods.reproduction_tools import (
-    single_crossover,
-    parent_pairing
-)
-
+from src.methods.reproduction_tools import single_crossover, parent_pairing
 
 #############################################################################
 PROJECT_PATH = Path(__file__).resolve().parent.parent
@@ -36,7 +32,7 @@ PENALTY_PERCENTAGE = 1
 if SEED is not None:
     rng = np.random.default_rng(seed=SEED)
 else:
-    rng = None
+    rng = np.random.default_rng()
 
 value_weight_dict = load_data(path=LARGE_SCALE_PATH / FILENAME)
 
@@ -69,7 +65,7 @@ log_output(
     best_genome_index=best_idx,
     fitness=best_score,
     weight=weight,
-    message=str("Population created successfully as iteration " + str(iter)),
+    message=str("Population created successfully as iteration 0"),
 )
 
 for i in range(1, ITERATIONS + 1):

@@ -8,17 +8,15 @@ from src.methods.utils import load_memmap
 
 
 def parent_pairing(
-    parent_pool: numpy.ndarray[int], rng: np.random.Generator | None = None
+    parent_pool: numpy.ndarray[int], rng: np.random.Generator
 ) -> np.ndarray[tuple[int, int]]:
     # TODO: docstrings
-    if rng is None:
-        rng = np.random.default_rng()
     return rng.permutation(parent_pool).reshape(-1, 2)
 
 
 def single_crossover(
     parent_pairs: np.ndarray[tuple[int, int]],
-    rng: np.random.Generator | None = None,
+    rng: np.random.Generator,
     crossover_probability: float = 1,
     mutation_probability: float = 0.1,
 ) -> None:
@@ -27,8 +25,6 @@ def single_crossover(
     TEMP = PROJECT_ROOT / "temp"
     TEMP.mkdir(exist_ok=True)
     CHILDREN_DAT = TEMP / "children_temp.dat"
-    if rng is None:
-        rng = np.random.default_rng()
     population, config = load_memmap("population")
     children = np.memmap(
         CHILDREN_DAT,
@@ -78,8 +74,8 @@ def single_crossover(
 def mutation(
     child,
     genome_length: int,
+    rng: np.random.Generator,
     mutation_probability: float = 0.1,
-    rng: np.random.Generator | None = None,
 ):
     # TODO: docstrings
     child = np.array(child, copy=True)
