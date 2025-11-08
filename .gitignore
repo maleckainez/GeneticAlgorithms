@@ -9,3 +9,7 @@
 /src/methods/.ipynb_checkpoints/selection_methods-checkpoint.py
 */.ipynb_checkpoints/
 /src/methods/.ipynb_checkpoints/
+*/notes.md
+*.log
+*.dat
+*.json
