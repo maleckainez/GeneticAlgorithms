@@ -161,8 +161,8 @@ def log_output(
     path: Path = Path(__file__).resolve().parents[2],
 ):
 
-    with open(path / "output.log", "a+") as output:
-        if iteration or best_genome_index or fitness or weight is not None:
+    with (open(path / "output.log", "a+") as output):
+        if iteration is not None or best_genome_index is not None or fitness is not None or weight is not None:
             output.writelines(
                 f"Iteration {iteration}:\n"
                 f"      index:{best_genome_index}\n"
