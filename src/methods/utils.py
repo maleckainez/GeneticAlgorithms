@@ -62,10 +62,10 @@ def create_population(population_size: int, genome_length: int) -> np.ndarray:
 
 
 def find_temp_directory():
-    PROJECT_ROOT = Path(__file__).resolve().parents[2]
-    TEMP = PROJECT_ROOT / "temp"
-    TEMP.mkdir(exist_ok=True)
-    return TEMP
+    project_root = Path(__file__).resolve().parents[2]
+    temp = project_root / "temp"
+    temp.mkdir(exist_ok=True)
+    return temp
 
 
 def create_population_file(
@@ -74,13 +74,16 @@ def create_population_file(
     stream_batch: int,
     rng: np.random.Generator,
     probability_of_failure: float | None = None,
+    filename_constant: str | None = None,
 ) -> None:
     # TODO: docstrings
-    TEMP = find_temp_directory()
-    POPULATION_DAT = TEMP / "population.dat"
-    POPULATION_JSON = TEMP / "population.json"
+    if filename_constant is None:
+        filename_constant = "population"
+    temp = find_temp_directory()
+    population_dat = temp / f"{filename_constant}.dat"
+    population_json = temp / f"{filename_constant}.json"
     population = np.memmap(
-        filename=POPULATION_DAT,
+        filename=population_dat,
         dtype=np.uint8,
         mode="w+",
         shape=(population_size, genome_length),
@@ -95,12 +98,12 @@ def create_population_file(
         population[start:stop] = batch
         population.flush()
     create_memmap_config_json(
-        POPULATION_JSON, POPULATION_DAT, np.uint8, population_size, genome_length
+        population_json, population_dat, np.uint8, population_size, genome_length
     )
 
 
 def create_memmap_config_json(
-    path: Path, dat_path: Path, datatype: type, population_size: int, genome_length
+    path: Path, dat_path: Path, datatype: type, population_size: int, genome_length: int
 ) -> None:
     # TODO: docstrings
     config = {
@@ -114,13 +117,16 @@ def create_memmap_config_json(
         json.dump(config, file, indent=4)
 
 
-def load_memmap(config_filename: str | None = None, open_mode: str = "r"):
+def load_memmap(
+    filename_constant: str | None = None,
+    open_mode: str = "r"
+) -> tuple[np.memmap, dict[str, any]]:
     # TODO: docstrings
-    TEMP = find_temp_directory()
-    if config_filename is None:
-        config_filename = "population"
+    temp = find_temp_directory()
+    if filename_constant is None:
+        filename_constant = "population"
 
-    config_path = TEMP / (config_filename + ".json")
+    config_path = temp / (filename_constant + ".json")
 
     if not config_path.exists():
         raise FileNotFoundError(f"{config_path} does not exist")
@@ -146,23 +152,31 @@ def load_memmap(config_filename: str | None = None, open_mode: str = "r"):
 
 def clear_temp_files():
     # TODO: docstrings
-    TEMP = find_temp_directory()
-    if TEMP.exists():
-        shutil.rmtree(TEMP)
+    temp = find_temp_directory()
+    if temp.exists():
+        shutil.rmtree(temp)
 
 
 def log_output(
-    # TODO: Depreciate, use python logging library, avoid opening population in every iteration -> time and memory consuming!
+    # TODO: Deprecate, use python logging library, avoid opening population in every iteration -> time and memory consuming!
+    filename_constant: str | None = None,
     iteration: int | None = None,
     best_genome_index: int | None = None,
     fitness: int | None = None,
     weight: int | None = None,
     message: str | None = None,
+    genome: np.ndarray | None = None,
     path: Path = Path(__file__).resolve().parents[2],
 ):
-
-    with (open(path / "output.log", "a+") as output):
-        if iteration is not None or best_genome_index is not None or fitness is not None or weight is not None:
+    if filename_constant is None:
+        filename_constant = ""
+    with open(path / f"result_{filename_constant}.log", "a+") as output:
+        if (
+            iteration is not None
+            or best_genome_index is not None
+            or fitness is not None
+            or weight is not None
+        ):
             output.writelines(
                 f"Iteration {iteration}:\n"
                 f"      index:{best_genome_index}\n"
@@ -171,13 +185,18 @@ def log_output(
             )
         if message is not None:
             output.writelines(f"Additional message: {message}\n")
-    if best_genome_index is not None:
-        population, _ = load_memmap()
-        with open(path / "best_chromosomes.log", "a+") as best_chromosomes:
-            best_chromosomes.writelines(
-                f"Best chromosome for iteration {iteration} with fitness {fitness}:\n {population[best_genome_index]}\n"
-            )
-        population._mmap.close()
+    if genome is not None:
+        with open(path / f"chromosomes_{filename_constant}.log", "a+") as best_chromosomes:
+            if fitness > 0:
+
+                genome="".join(str(i) for i in genome.tolist())
+                best_chromosomes.writelines(
+                    f"Best chromosome for iteration {iteration} with fitness {fitness}:\n {genome}\n"
+                )
+            else:
+                best_chromosomes.writelines(
+                    f"No chromosome for iteration {iteration} with fitness higher than 0\n"
+                )
 
 
 def final_screen():

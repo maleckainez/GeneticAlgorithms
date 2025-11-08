@@ -4,11 +4,12 @@ import numpy
 import numpy as np
 import os
 
-from src.methods.utils import load_memmap
+from src.methods.utils import find_temp_directory
 
 
 def parent_pairing(
-    parent_pool: numpy.ndarray[int], rng: np.random.Generator
+        parent_pool: numpy.ndarray[int],
+        rng: np.random.Generator
 ) -> np.ndarray[tuple[int, int]]:
     # TODO: docstrings
     return rng.permutation(parent_pool).reshape(-1, 2)
@@ -17,58 +18,54 @@ def parent_pairing(
 def single_crossover(
     parent_pairs: np.ndarray[tuple[int, int]],
     rng: np.random.Generator,
+    population_file_handle: np.memmap,
+    population_file_config: dict[str, any],
     crossover_probability: float = 1,
     mutation_probability: float = 0.1,
 ) -> None:
     # TODO: docstrings, make the method more modular
-    PROJECT_ROOT = Path(__file__).resolve().parents[2]
-    TEMP = PROJECT_ROOT / "temp"
-    TEMP.mkdir(exist_ok=True)
+    TEMP = find_temp_directory()
     CHILDREN_DAT = TEMP / "children_temp.dat"
-    population, config = load_memmap("population")
     children = np.memmap(
         CHILDREN_DAT,
         dtype=np.uint8,
         mode="w+",
-        shape=(config["population_size"], config["genome_length"]),
+        shape=(population_file_config["population_size"], population_file_config["genome_length"]),
     )
     for i in range(len(parent_pairs)):
         index_paren1, index_parent2 = parent_pairs[i]
-        p1 = population[index_paren1]
-        p2 = population[index_parent2]
+        p1 = population_file_handle[index_paren1]
+        p2 = population_file_handle[index_parent2]
         if rng.random() <= crossover_probability:
-            cut_place = rng.integers(0, config["genome_length"])
+            cut_place = rng.integers(0, population_file_config["genome_length"])
             children[2 * i] = mutation(
                 child=np.concatenate((p1[:cut_place], p2[cut_place:])),
                 mutation_probability=mutation_probability,
                 rng=rng,
-                genome_length=config["genome_length"],
+                genome_length=population_file_config["genome_length"],
             )
             children[(2 * i) + 1] = mutation(
                 child=np.concatenate((p2[:cut_place], p1[cut_place:])),
                 mutation_probability=mutation_probability,
                 rng=rng,
-                genome_length=config["genome_length"],
+                genome_length=population_file_config["genome_length"],
             )
         else:
             children[(2 * i)] = mutation(
                 child=p1,
                 mutation_probability=mutation_probability,
                 rng=rng,
-                genome_length=config["genome_length"],
+                genome_length=population_file_config["genome_length"],
             )
             children[(2 * i) + 1] = mutation(
                 child=p2,
                 mutation_probability=mutation_probability,
                 rng=rng,
-                genome_length=config["genome_length"],
+                genome_length=population_file_config["genome_length"],
             )
         children.flush()
-
-    population._mmap.close()
-    children._mmap.close()
-    os.remove(config["filename"])
-    os.rename(CHILDREN_DAT, config["filename"])
+    os.remove(population_file_config["filename"])
+    os.rename(CHILDREN_DAT, population_file_config["filename"])
 
 
 def mutation(
