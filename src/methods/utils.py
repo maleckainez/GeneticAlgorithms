@@ -192,7 +192,7 @@ def log_output(
 
                 genome = "".join(str(i) for i in genome.tolist())
                 best_chromosomes.writelines(
-                    f"Best chromosome for iteration {iteration} with fitness {fitness}:\n {genome}\n"
+                    f"Best chromosome for iteration {iteration} with fitness {fitness}:\n{genome}\n"
                 )
             else:
                 best_chromosomes.writelines(

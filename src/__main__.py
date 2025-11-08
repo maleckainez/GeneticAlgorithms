@@ -14,6 +14,7 @@ from src.methods.reproduction_tools import (
     single_crossover,
     parent_pairing,
     single_crossover_batched,
+    double_crossover_batched,
 )
 from src.methods.experiment_defining_tools import create_unique_experiment_name
 
@@ -30,8 +31,8 @@ SEED = None
 MAX_WEIGHT = 1000
 CROSSOVER_PROBABILITY = 0.7
 MUTATION_PROBABILITY = 0.001
-ITERATIONS = int(100)
-POPULATION_SIZE = int(1e5)
+ITERATIONS = int(200)
+POPULATION_SIZE = int(1e3)
 PENALTY_PERCENTAGE = 1
 EXPERIMENT_NO = 1
 #################################################################################
@@ -109,7 +110,7 @@ for i in range(1, ITERATIONS + 1):
         population_file_config=population_file_config,
     )
     parent_pairs = parent_pairing(parent_pool=parent_pool, rng=rng)
-    single_crossover_batched(
+    double_crossover_batched(
         parent_pairs=parent_pairs,
         rng=rng,
         crossover_probability=CROSSOVER_PROBABILITY,
