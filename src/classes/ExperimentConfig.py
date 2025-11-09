@@ -13,8 +13,8 @@ class ExperimentConfig:
     mutation_probability: float
     penalty: float
     experiment_identifier: int
-    stream_batch_size: int | None
-    rng: np.random.Generator | None
+    stream_batch_size: int | None = None
+    rng: np.random.Generator | None = None
 
     def __post_init__(self):
         if self.crossover_probability > 1 or self.crossover_probability < 0:

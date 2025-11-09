@@ -1,4 +1,5 @@
 from src.classes.ExperimentConfig import ExperimentConfig
+from src.classes.PathResolver import PathResolver
 from src.methods.utils import create_population_file, load_memmap
 
 
@@ -7,6 +8,7 @@ class PopulationHandler:
     def __init__(
         self,
         config: ExperimentConfig,
+        paths: PathResolver,
         genome_length: int,
         filename_constant: str,
         weight_sum: int,
@@ -17,8 +19,10 @@ class PopulationHandler:
         self.rng = config.rng
         self.q = config.generate_probability_of_failure(weight_sum)
         self.filename_constant = filename_constant
+        self.temp_path = paths.get_temp_path()
 
         create_population_file(
+            temp= self.temp_path,
             population_size=self.population_size,
             genome_length=self.genome_length,
             stream_batch=self.stream_batch,
@@ -28,7 +32,9 @@ class PopulationHandler:
         )
 
         self.pop_handle, self.pop_config = load_memmap(
-            filename_constant=self.filename_constant, open_mode="r"
+            filename_constant=self.filename_constant,
+            open_mode="r",
+            temp=self.temp_path,
         )
 
     def get_population_handle(self):

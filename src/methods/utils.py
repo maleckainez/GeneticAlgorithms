@@ -40,7 +40,7 @@ def load_data(path: str | Path) -> np.ndarray:
                 f"Invalid values on line {i+1}: received non integer input {line}"
             )
         data_in_lines.append([value, weight])
-        items = np.ndarray(data_in_lines, dtype=np.int64)
+        items = np.array(data_in_lines, dtype=np.int64)
     return items
 
 def create_population_file(

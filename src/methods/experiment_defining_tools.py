@@ -1,22 +1,27 @@
 import re
+from src.classes.ExperimentConfig import ExperimentConfig
 
 
 def create_unique_experiment_name(
-    filename: str,
-    population_length: int,
-    genome_width: int,
-    number_of_generations: int,
-    crossover: float,
-    mutation: float,
-    exp_no: int,
+    config: ExperimentConfig,
+    genome_length: int,
 ) -> str:
+    crossover = config.crossover_probability
+    mutation = config.mutation_probability
+    filename = config.data_filename
+    population_length = config.population_size
+    genome_length = genome_length
+    number_of_generations = config.generations
+    exp_no = config.experiment_identifier
+
+
     cr = re.sub(r"\.", "p", f"{crossover}")
     mr = re.sub(r"\.", "p", f"{mutation}")
     fname = re.sub("[^A-Za-z0-9]+", "", filename)
     parts = [
         fname,
         f"PS{population_length}",
-        f"GW{genome_width}",
+        f"GW{genome_length}",
         f"GE{number_of_generations}",
         f"CR{cr}",
         f"MR{mr}",

@@ -55,7 +55,7 @@ try:
     experiment_name = create_unique_experiment_name(
         filename=FILENAME,
         population_length=POPULATION_SIZE,
-        genome_width=len(value_weight_dict),
+        genome_length=len(value_weight_dict),
         number_of_generations=ITERATIONS,
         crossover=CROSSOVER_PROBABILITY,
         mutation=MUTATION_PROBABILITY,
