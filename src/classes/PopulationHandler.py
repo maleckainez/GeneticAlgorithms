@@ -37,8 +37,23 @@ class PopulationHandler:
             temp=self.temp_path,
         )
 
-    def get_population_handle(self):
+    def get_pop_handle(self):
         return self.pop_handle
 
-    def get_population_config(self):
+    def get_pop_config(self):
         return self.pop_config
+
+    def open_pop(self,open_mode: str="r") -> None:
+        if self.pop_handle is None:
+            self.pop_handle = load_memmap(
+                filename_constant=self.filename_constant,
+                open_mode=open_mode,
+                temp=self.temp_path,
+            )
+
+    def close(self):
+        if self.pop_handle is not None:
+            self.pop_handle.flush()
+            del self.pop_handle
+            self.pop_handle = None
+

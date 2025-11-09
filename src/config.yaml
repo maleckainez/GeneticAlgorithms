@@ -17,7 +17,7 @@ population:
 genetic_operators:
   crossover_probability: 0.8        # Probability of crossover occurrence (Pc)
   mutation_probability: 0.01        # Probability of mutation occurrence (Pm)
-  penalty_percentage: 0.9           # Penalty factor applied after exceeding threshold weight
+  penalty_percentage: 1             # Penalty factor applied after exceeding threshold weight
 
 # --- EXPERIMENT VARIABLES ---
 experiment:

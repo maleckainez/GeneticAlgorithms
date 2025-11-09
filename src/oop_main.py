@@ -1,7 +1,8 @@
 from src.classes.ExperimentConfig import ExperimentConfig
 from src.classes.PathResolver import PathResolver
-from src.classes.PopulationHandler import PopulationHandler
+from src.classes.PopulationHandler import PopulationHandler as PopHandler
 from src.methods.experiment_defining_tools import create_unique_experiment_name
+from src.methods.fitness_score import calc_fitness_score, calc_fitness_score_batched
 from src.methods.utils import load_yaml_config, load_data
 
 # Loads yaml file and flatten it to config dict
@@ -23,13 +24,18 @@ filename_constant = create_unique_experiment_name(
 )
 
 # Creates starter population mmap
-starter_pop = PopulationHandler(
+population_manager = PopHandler(
     config=config,
     paths=paths,
     genome_length= value_weight_array.shape[0],
     filename_constant=filename_constant,
     weight_sum=value_weight_array[:, 1].sum()
-).pop_handle
+)
 
+fitness = calc_fitness_score_batched(
+    value_weight_arr=value_weight_array,
+    config=config,
+    pop_manager=population_manager
+)
 
-
+print(fitness)
