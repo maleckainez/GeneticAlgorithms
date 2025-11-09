@@ -22,7 +22,7 @@ class PopulationHandler:
         self.temp_path = paths.get_temp_path()
 
         create_population_file(
-            temp= self.temp_path,
+            temp=self.temp_path,
             population_size=self.population_size,
             genome_length=self.genome_length,
             stream_batch=self.stream_batch,
@@ -43,7 +43,7 @@ class PopulationHandler:
     def get_pop_config(self):
         return self.pop_config
 
-    def open_pop(self,open_mode: str="r") -> None:
+    def open_pop(self, open_mode: str = "r") -> None:
         if self.pop_handle is None:
             self.pop_handle = load_memmap(
                 filename_constant=self.filename_constant,
@@ -56,4 +56,3 @@ class PopulationHandler:
             self.pop_handle.flush()
             del self.pop_handle
             self.pop_handle = None
-

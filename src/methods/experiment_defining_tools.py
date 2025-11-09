@@ -1,4 +1,6 @@
 import re
+import datetime
+
 from src.classes.ExperimentConfig import ExperimentConfig
 
 
@@ -14,7 +16,6 @@ def create_unique_experiment_name(
     number_of_generations = config.generations
     exp_no = config.experiment_identifier
 
-
     cr = re.sub(r"\.", "p", f"{crossover}")
     mr = re.sub(r"\.", "p", f"{mutation}")
     fname = re.sub("[^A-Za-z0-9]+", "", filename)
@@ -25,7 +26,7 @@ def create_unique_experiment_name(
         f"GE{number_of_generations}",
         f"CR{cr}",
         f"MR{mr}",
-        f"EXP{exp_no:03d}",
+        f"EXP{exp_no:03d}" f"T{datetime.datetime.now().strftime('%M%S')}",
     ]
     unique_id = "-".join(parts)
     return unique_id

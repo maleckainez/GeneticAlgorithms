@@ -13,6 +13,7 @@ class ExperimentConfig:
     mutation_probability: float
     penalty: float
     experiment_identifier: int
+    log_level: str
     stream_batch_size: int | None = None
     rng: np.random.Generator | None = None
 

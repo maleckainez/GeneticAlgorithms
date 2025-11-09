@@ -1,10 +1,14 @@
 # --> IMPORTS <--
+import logging
 import os.path
 from pathlib import Path
 import numpy as np
 import json
 
 import yaml
+
+from src.classes.ExperimentConfig import ExperimentConfig
+from src.classes.PathResolver import PathResolver
 
 
 # --> UTILS <--
@@ -43,6 +47,7 @@ def load_data(path: str | Path) -> np.ndarray:
         items = np.array(data_in_lines, dtype=np.int64)
     return items
 
+
 def create_population_file(
     population_size: int,
     genome_length: int,
@@ -78,11 +83,7 @@ def create_population_file(
 
 
 def create_memmap_config_json(
-    path: Path,
-    dat_path: Path,
-    datatype: type,
-    population_size: int,
-    genome_length: int
+    path: Path, dat_path: Path, datatype: type, population_size: int, genome_length: int
 ) -> None:
     # TODO: docstrings
     config = {
@@ -129,50 +130,6 @@ def load_memmap(
     return data_file, config
 
 
-def log_output(
-    # TODO: Deprecate, use python logging library, avoid opening population in every iteration -> time and memory consuming!
-    log_path: Path,
-    filename_constant: str | None = None,
-    iteration: int | None = None,
-    best_genome_index: int | None = None,
-    fitness: int | None = None,
-    weight: int | None = None,
-    message: str | None = None,
-    genome: np.ndarray | None = None,
-):
-    if filename_constant is None:
-        filename_constant = ""
-    with open(log_path / f"result_{filename_constant}.log", "a+") as output:
-        if (
-            iteration is not None
-            or best_genome_index is not None
-            or fitness is not None
-            or weight is not None
-        ):
-            output.writelines(
-                f"Iteration {iteration}:\n"
-                f"      index:{best_genome_index}\n"
-                f"      fitness: {fitness}\n"
-                f"      weight: {weight}\n"
-            )
-        if message is not None:
-            output.writelines(f"{message}\n")
-    if genome is not None:
-        with open(
-            log_path / f"chromosomes_{filename_constant}.log", "a+"
-        ) as best_chromosomes:
-            if fitness > 0:
-
-                genome = "".join(str(i) for i in genome.tolist())
-                best_chromosomes.writelines(
-                    f"Best chromosome for iteration {iteration} with fitness {fitness}:\n{genome}\n"
-                )
-            else:
-                best_chromosomes.writelines(
-                    f"No chromosome for iteration {iteration} with fitness higher than 0\n"
-                )
-
-
 def final_screen():
     print(
         r""" 
@@ -207,6 +164,7 @@ def load_yaml_config(filepath: Path | str) -> dict:
         "penalty": yaml_file["genetic_operators"]["penalty_percentage"],
         "seed": yaml_file["experiment"]["seed"],
         "experiment_identifier": yaml_file["experiment"]["identifier"],
+        "log_level": yaml_file["experiment"]["log_level"],
     }
 
     return yaml_config

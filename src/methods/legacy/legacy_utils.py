@@ -2,6 +2,7 @@ import numpy as np
 from pathlib import Path
 from shutil import rmtree
 
+
 def create_population(population_size: int, genome_length: int) -> np.ndarray:
     """
     This function is deprecated!
@@ -66,3 +67,47 @@ def calc_fitness_score(
             score = int(score * (1 - penalty) * (excess / weight))
         fitness_score[row] = [score, weight]
     return fitness_score
+
+
+# FINALLY DEPRECATED
+def log_output(
+    log_path: Path,
+    filename_constant: str | None = None,
+    iteration: int | None = None,
+    best_genome_index: int | None = None,
+    fitness: int | None = None,
+    weight: int | None = None,
+    message: str | None = None,
+    genome: np.ndarray | None = None,
+):
+    if filename_constant is None:
+        filename_constant = ""
+    with open(log_path / f"result_{filename_constant}.log", "a+") as output:
+        if (
+            iteration is not None
+            or best_genome_index is not None
+            or fitness is not None
+            or weight is not None
+        ):
+            output.writelines(
+                f"Iteration {iteration}:\n"
+                f"      index:{best_genome_index}\n"
+                f"      fitness: {fitness}\n"
+                f"      weight: {weight}\n"
+            )
+        if message is not None:
+            output.writelines(f"{message}\n")
+    if genome is not None:
+        with open(
+            log_path / f"chromosomes_{filename_constant}.log", "a+"
+        ) as best_chromosomes:
+            if fitness > 0:
+
+                genome = "".join(str(i) for i in genome.tolist())
+                best_chromosomes.writelines(
+                    f"Best chromosome for iteration {iteration} with fitness {fitness}:\n{genome}\n"
+                )
+            else:
+                best_chromosomes.writelines(
+                    f"No chromosome for iteration {iteration} with fitness higher than 0\n"
+                )

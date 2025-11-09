@@ -6,9 +6,9 @@ from src.classes.PopulationHandler import PopulationHandler
 
 
 def calc_fitness_score_batched(
-        value_weight_arr: np.ndarray,
-        config: ExperimentConfig,
-        pop_manager: PopulationHandler,
+    value_weight_arr: np.ndarray,
+    config: ExperimentConfig,
+    pop_manager: PopulationHandler,
 ):
 
     max_weight = config.max_weight
@@ -19,7 +19,7 @@ def calc_fitness_score_batched(
     value = value_weight_arr[:, 0]
     weight = value_weight_arr[:, 1]
 
-    fitness_score = np.zeros(shape=(population.shape[0],2), dtype=np.int64)
+    fitness_score = np.zeros(shape=(population.shape[0], 2), dtype=np.int64)
 
     for start in range(0, population.shape[0], batch):
         stop = min(start + batch, population.shape[0])
@@ -30,12 +30,14 @@ def calc_fitness_score_batched(
         if penalty_factor == 1:
             penalty_value = calculated_scores
         else:
-            penalty_value = np.maximum(0, calculated_weights-max_weight)*penalty_factor
-        penalized_score = np.where(over_limit_mask, calculated_scores-penalty_value,calculated_scores)
+            penalty_value = (
+                np.maximum(0, calculated_weights - max_weight) * penalty_factor
+            )
+        penalized_score = np.where(
+            over_limit_mask, calculated_scores - penalty_value, calculated_scores
+        )
 
-        fitness_score[start:stop] = np.array((penalized_score, calculated_weights)).transpose()
+        fitness_score[start:stop] = np.array(
+            (penalized_score, calculated_weights)
+        ).transpose()
     return fitness_score
-
-
-
-
