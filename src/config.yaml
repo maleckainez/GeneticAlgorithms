@@ -1,0 +1,25 @@
+
+# === Knapsack algorithm configuration file ===
+
+
+# --- DATA AND FILEPATHS ---
+data:
+  filename: "knapPI_2_100_1000_1"   # Filename without path from "dane AG 2" file
+  max_weight: 1000                  # Max weight threshold for GA
+
+# --- POPULATION PARAMETERS ---
+population:
+  size: 5000                        # population_size (N)
+  generations: 200                  # generations (number of algorithm's iterations)
+  stream_batch_size: 500            # stream_batch_size (size of memory i/o batch)
+
+# --- GENETIC OPERATORS ---
+genetic_operators:
+  crossover_probability: 0.8        # Probability of crossover occurrence (Pc)
+  mutation_probability: 0.01        # Probability of mutation occurrence (Pm)
+  penalty_percentage: 0.9           # Penalty factor applied after exceeding threshold weight
+
+# --- EXPERIMENT VARIABLES ---
+experiment:
+  seed: null                        # Predefined RNG seed (if null, rng will be defined randomly)
+  identifier: 2                     # Experiment identifier (will be defined in next versions)

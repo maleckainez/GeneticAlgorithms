@@ -32,15 +32,20 @@ def tournament_selection(
     tournament_size: int = 5,
 ) -> list[int]:
 
-    fitness_list = fitness_score[:,0]
+    fitness_list = fitness_score[:, 0]
     selected_parents = []
     # takes up chunk of population, checks best idx of fitness
     for i in range(population_file_config["population_size"]):
-        gladiators = rng.choice(fitness_list, size=tournament_size, replace=False)
+        gladiators = rng.choice(
+            population_file_config["population_size"],
+            size=tournament_size,
+            replace=False,
+        )
         winner = int(np.argmax(fitness_list[gladiators]))
         selected_parents.append(int(gladiators[winner]))
 
     return selected_parents
+
 
 def truncation_selection():
     raise NotImplementedError()

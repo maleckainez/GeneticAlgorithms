@@ -5,6 +5,8 @@ from pathlib import Path
 import numpy as np
 import json
 
+import yaml
+
 
 # --> UTILS <--
 def load_data(path: str | Path) -> dict:
@@ -155,8 +157,9 @@ def clear_temp_files():
     if temp.exists():
         shutil.rmtree(temp)
 
+
 def create_output_path():
-    ROOT=Path(__file__).resolve().parents[2]
+    ROOT = Path(__file__).resolve().parents[2]
     OUTPUT = ROOT / "output"
     OUTPUT.mkdir(parents=True, exist_ok=True)
     return OUTPUT
@@ -171,7 +174,7 @@ def log_output(
     weight: int | None = None,
     message: str | None = None,
     genome: np.ndarray | None = None,
-    path: Path=create_output_path(),
+    path: Path = create_output_path(),
 ):
     if filename_constant is None:
         filename_constant = ""
@@ -221,3 +224,25 @@ def final_screen():
         /_/   /_/_/ /_/_/____/_/ /_/\___/\__,_/  (_)        
                                                             """
     )
+
+
+def load_yaml_config(filepath: Path | str) -> dict:
+    with open(filepath, "r") as file:
+        yaml_file = yaml.safe_load(file)
+
+    yaml_config = {
+        "data_filename": yaml_file["data"]["filename"],
+        "max_weight": yaml_file["data"]["max_weight"],
+        "population_size": yaml_file["population"]["size"],
+        "generations": yaml_file["population"]["generations"],
+        "stream_batch_size": yaml_file["population"]["stream_batch_size"],
+        "crossover_probability": yaml_file["genetic_operators"][
+            "crossover_probability"
+        ],
+        "mutation_probability": yaml_file["genetic_operators"]["mutation_probability"],
+        "penalty": yaml_file["genetic_operators"]["penalty_percentage"],
+        "seed": yaml_file["experiment"]["seed"],
+        "experiment_identifier": yaml_file["experiment"]["identifier"],
+    }
+
+    return yaml_config

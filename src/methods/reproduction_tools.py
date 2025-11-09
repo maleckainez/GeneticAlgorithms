@@ -12,6 +12,7 @@ def parent_pairing(
     # TODO: docstrings
     return rng.permutation(parent_pool).reshape(-1, 2)
 
+
 # DEPRECATED
 def single_crossover(
     parent_pairs: np.ndarray[tuple[int, int]],
@@ -90,10 +91,16 @@ def single_crossover_batched(
         children2 = parents2.copy()
 
         crossover_mask = rng.random(size=stop - start) < crossover_probability
-        first_crossover_points = rng.integers(1, children1.shape[1]-1, size=len(parent_indices))
-        second_crossover_points = rng.integers(first_crossover_points+1, children1.shape[1], size=len(parent_indices))
+        first_crossover_points = rng.integers(
+            1, children1.shape[1] - 1, size=len(parent_indices)
+        )
+        second_crossover_points = rng.integers(
+            first_crossover_points + 1, children1.shape[1], size=len(parent_indices)
+        )
 
-        crossover_points = np.column_stack((first_crossover_points, second_crossover_points))
+        crossover_points = np.column_stack(
+            (first_crossover_points, second_crossover_points)
+        )
 
         for i in range(len(parent_indices)):
             if crossover_mask[i] == 1:
@@ -109,9 +116,10 @@ def single_crossover_batched(
                 children1[i, mutation_mask] = 1 - children1[i, mutation_mask]
                 children2[i, mutation_mask] = 1 - children2[i, mutation_mask]
 
-        children[start*2:stop*2] = np.concatenate((children1, children2), axis=0)
+        children[start * 2 : stop * 2] = np.concatenate((children1, children2), axis=0)
         children.flush()
     clean_children_temp(population_file_config)
+
 
 def double_crossover_batched(
     parent_pairs: np.ndarray[tuple[int, int]],
@@ -150,9 +158,10 @@ def double_crossover_batched(
                 children1[i, mutation_mask] = 1 - children1[i, mutation_mask]
                 children2[i, mutation_mask] = 1 - children2[i, mutation_mask]
 
-        children[start*2:stop*2] = np.concatenate((children1, children2), axis=0)
+        children[start * 2 : stop * 2] = np.concatenate((children1, children2), axis=0)
         children.flush()
     clean_children_temp(population_file_config)
+
 
 def mutation(
     child,
