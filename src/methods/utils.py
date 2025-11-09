@@ -8,7 +8,7 @@ import yaml
 
 
 # --> UTILS <--
-def load_data(path: str | Path) -> dict:
+def load_data(path: str | Path) -> np.ndarray:
     """
     This function takes path to the file that contains data in format:
     <value> <weight>
@@ -26,7 +26,7 @@ def load_data(path: str | Path) -> dict:
         lines = [line.strip() for line in f.readlines() if line.strip()]
     if not lines:
         raise ValueError("File is empty")
-    items = {}
+    data_in_lines = []
     for i, line in enumerate(lines):
         parts = line.split()
         if len(parts) != 2:
@@ -39,7 +39,8 @@ def load_data(path: str | Path) -> dict:
             raise ValueError(
                 f"Invalid values on line {i+1}: received non integer input {line}"
             )
-        items[i] = [value, weight]
+        data_in_lines.append([value, weight])
+        items = np.ndarray(data_in_lines, dtype=np.int64)
     return items
 
 def create_population_file(
