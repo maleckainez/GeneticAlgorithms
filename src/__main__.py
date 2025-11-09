@@ -9,7 +9,10 @@ from src.methods.utils import (
     load_memmap,
 )
 from src.methods.fitness_score import calc_fitness_score
-from src.methods.selection_methods import fitness_proportionate_selection
+from src.methods.selection_methods import (
+    fitness_proportionate_selection,
+    tournament_selection,
+)
 from src.methods.reproduction_tools import (
     single_crossover,
     parent_pairing,
@@ -29,12 +32,12 @@ FILENAME = "knapPI_2_100_1000_1"
 
 SEED = None
 MAX_WEIGHT = 1000
-CROSSOVER_PROBABILITY = 0.7
-MUTATION_PROBABILITY = 0.001
+CROSSOVER_PROBABILITY = 0.8
+MUTATION_PROBABILITY = 0
 ITERATIONS = int(200)
-POPULATION_SIZE = int(1e3)
-PENALTY_PERCENTAGE = 1
-EXPERIMENT_NO = 1
+POPULATION_SIZE = int(5e3)
+PENALTY_PERCENTAGE = 0.9
+EXPERIMENT_NO = 2
 #################################################################################
 
 try:
@@ -103,14 +106,13 @@ for i in range(1, ITERATIONS + 1):
     population_file_handle, population_file_config = load_memmap(
         filename_constant=experiment_name
     )
-    parent_pool = fitness_proportionate_selection(
+    parent_pool = tournament_selection(
         fitness_score=fitness,
-        parent_group_size=POPULATION_SIZE,
         rng=rng,
         population_file_config=population_file_config,
     )
     parent_pairs = parent_pairing(parent_pool=parent_pool, rng=rng)
-    double_crossover_batched(
+    single_crossover_batched(
         parent_pairs=parent_pairs,
         rng=rng,
         crossover_probability=CROSSOVER_PROBABILITY,

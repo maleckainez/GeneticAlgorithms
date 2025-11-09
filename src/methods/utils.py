@@ -155,6 +155,12 @@ def clear_temp_files():
     if temp.exists():
         shutil.rmtree(temp)
 
+def create_output_path():
+    ROOT=Path(__file__).resolve().parents[2]
+    OUTPUT = ROOT / "output"
+    OUTPUT.mkdir(parents=True, exist_ok=True)
+    return OUTPUT
+
 
 def log_output(
     # TODO: Deprecate, use python logging library, avoid opening population in every iteration -> time and memory consuming!
@@ -165,7 +171,7 @@ def log_output(
     weight: int | None = None,
     message: str | None = None,
     genome: np.ndarray | None = None,
-    path: Path = Path(__file__).resolve().parents[2],
+    path: Path=create_output_path(),
 ):
     if filename_constant is None:
         filename_constant = ""
@@ -183,7 +189,7 @@ def log_output(
                 f"      weight: {weight}\n"
             )
         if message is not None:
-            output.writelines(f"Additional message: {message}\n")
+            output.writelines(f"{message}\n")
     if genome is not None:
         with open(
             path / f"chromosomes_{filename_constant}.log", "a+"
