@@ -4,24 +4,24 @@
 
 # --- DATA AND FILEPATHS ---
 data:
-  filename: "f1_l-d_kp_10_269"   # Filename without path from "dane AG 2" file
-  max_weight: 1000                  # Max weight threshold for GA
+  filename: "f2_l-d_kp_20_878"   # Filename without path from "dane AG 2" file
+  max_weight: 878                  # Max weight threshold for GA
 
 # --- POPULATION PARAMETERS ---
 population:
-  size: 10000                        # population_size (N)
-  generations: 500                  # generations (number of algorithm's iterations)
-  stream_batch_size: 500            # stream_batch_size (size of memory i/o batch)
+  size: 200                        # population_size (N)
+  generations: 1000                  # generations (number of algorithm's iterations)
+  stream_batch_size: 50            # stream_batch_size (size of memory i/o batch)
 
 # --- SELECTION MODIFIER ---
 selection:
-  type: "roulette"             # Type of parent selection [roulette, tournament, rank]
+  type: "tournament"             # Type of parent selection [roulette, tournament, rank]
 
 # --- GENETIC OPERATORS ---
 genetic_operators:
   crossover_type: "two"             # Type of crossover method [one, two] (points of slicing)
   crossover_probability: 0.7        # Probability of crossover occurrence (Pc)
-  mutation_probability: 0        # Probability of mutation occurrence (Pm)
+  mutation_probability: 0.2        # Probability of mutation occurrence (Pm)
   penalty_percentage: 1             # Penalty factor applied after exceeding threshold weight
 
 # --- EXPERIMENT VARIABLES ---

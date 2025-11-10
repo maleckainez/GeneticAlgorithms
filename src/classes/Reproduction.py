@@ -46,11 +46,10 @@ class Reproduction:
             1, self.children.shape[1], size=len(parent_indices)
         )
         for i in range(len(parent_indices)):
-            if mask[i] == 1:
+            if mask[i]:
                 cut_point = crossover_points[i]
                 c1[i, cut_point:] = p2[i, cut_point:]
                 c2[i, cut_point:] = p1[i, cut_point:]
-            c1, c2 = self._mutation(c1,c2,i)
         return c1, c2
 
     def _kernel_double(self, c1, c2, p1, p2, mask, parent_indices):
@@ -70,7 +69,6 @@ class Reproduction:
                 c1[i, second_cut_point:] = p1[i, second_cut_point:]
                 c2[i, first_cut_point:] = p1[i, first_cut_point:]
                 c2[i, second_cut_point:] = p2[i, second_cut_point:]
-            c1, c2 = self._mutation(c1, c2, i)
         return c1, c2
 
     def _calculation_runner(self, kernel):
@@ -85,17 +83,18 @@ class Reproduction:
                 self.rng.random(size=stop - start) < self.crossover_probability
             )
             c1, c2 = kernel(c1, c2, p1, p2, mask, parent_indices)
+            if self.mutation_probability > 0:
+                self._mutation(c1, c2)
             self.children[start * 2 : stop * 2] = np.concatenate(
                 (c1, c2), axis=0
             )
             self.children.flush()
         self.children_manager.close()
 
-    def _mutation(self, c1, c2, i):
-        if self.mutation_probability > 0:
-            mutation_mask = (
-                self.rng.random(size=self.children.shape[1]) < self.mutation_probability
-            )
-            c1[i, mutation_mask] = 1 - c1[i, mutation_mask]
-            c2[i, mutation_mask] = 1 - c2[i, mutation_mask]
-        return c1, c2
+    def _mutation(self, c1, c2):
+            mask1 = (self.rng.random(size=c1.shape) < self.mutation_probability)
+            mask2 = (self.rng.random(size=c2.shape) < self.mutation_probability)
+            c1[mask1] ^= 1
+            c2[mask2] ^= 1
+            return c1, c2
+
