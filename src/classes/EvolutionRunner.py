@@ -28,9 +28,9 @@ CROSSOVER_METHODS = {
 
 
 class EvolutionRunner:
-    def __init__(self):
+    def __init__(self, input_config):
 
-        self._load_configuration()
+        self._load_configuration(input_config)
 
         self._prepare_environment()
 
@@ -38,9 +38,7 @@ class EvolutionRunner:
 
         self._load_strategies()
 
-    def _load_configuration(self):
-        # Loads yaml file and flatten it to config dict
-        input_config = load_yaml_config("config.yaml")
+    def _load_configuration(self,input_config):
 
         # Creates class instance handling config values
         self.config = ExperimentConfig(**input_config)
@@ -104,7 +102,7 @@ class EvolutionRunner:
         self.logger.info(f"{crossover_type} crossover method was chosen.")
 
     def evolve(self):
-        for iteration in range(self.generations):
+        for iteration in range(1, self.generations+1):
             parent_pool = self.selection_function(
                 fitness_arr=self.fitness, config=self.config
             )
@@ -117,13 +115,13 @@ class EvolutionRunner:
             )
             self._clean_children()
             self.population_manager.open_pop()
-            fitness = calc_fitness_score_batched(
+            self.fitness = calc_fitness_score_batched(
                 value_weight_arr=self.value_weight_array,
                 config=self.config,
                 pop_manager=self.population_manager,
             )
-            best_idx = fitness[:, 0].argmax()
-            best_score, weight = fitness[best_idx]
+            best_idx = self.fitness[:, 0].argmax()
+            best_score, weight = self.fitness[best_idx]
             log.generation(
                 logger=self.logger,
                 best_idx=best_idx,
@@ -136,6 +134,3 @@ class EvolutionRunner:
         self.population_manager.close()
         self.paths.clean_children_temp()
 
-
-if __name__ == "__main__":
-    EvolutionRunner().evolve()

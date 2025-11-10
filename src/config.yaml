@@ -4,25 +4,25 @@
 
 # --- DATA AND FILEPATHS ---
 data:
-  filename: "knapPI_2_100_1000_1"   # Filename without path from "dane AG 2" file
+  filename: "knapPI_1_10000_1000_1"   # Filename without path from "dane AG 2" file
   max_weight: 1000                  # Max weight threshold for GA
 
 # --- POPULATION PARAMETERS ---
 population:
-  size: 50000                        # population_size (N)
+  size: 1000000                        # population_size (N)
   generations: 500                  # generations (number of algorithm's iterations)
   stream_batch_size: 500            # stream_batch_size (size of memory i/o batch)
 
 # --- SELECTION MODIFIER ---
 selection:
-  type: "tournament"             # Type of parent selection [roulette, tournament, rank]
+  type: "roulette"             # Type of parent selection [roulette, tournament, rank]
 
 # --- GENETIC OPERATORS ---
 genetic_operators:
   crossover_type: "one"             # Type of crossover method [one, two] (points of slicing)
-  crossover_probability: 0.8        # Probability of crossover occurrence (Pc)
-  mutation_probability: 0.01        # Probability of mutation occurrence (Pm)
-  penalty_percentage: 0.3             # Penalty factor applied after exceeding threshold weight
+  crossover_probability: 0.7        # Probability of crossover occurrence (Pc)
+  mutation_probability: 0        # Probability of mutation occurrence (Pm)
+  penalty_percentage: 1             # Penalty factor applied after exceeding threshold weight
 
 # --- EXPERIMENT VARIABLES ---
 experiment:
