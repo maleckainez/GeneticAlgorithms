@@ -1,14 +1,10 @@
 from src.classes.ExperimentConfig import ExperimentConfig
 from src.classes.PathResolver import PathResolver
 from src.classes.PopulationHandler import PopulationHandler as PopHandler
+from src.classes.Reproduction import Reproduction
 from src.methods.experiment_defining_tools import create_unique_experiment_name
 from src.methods.fitness_score import calc_fitness_score_batched
-from src.methods.reproduction_tools import (
-    single_crossover_batched,
-    double_crossover_batched,
-    parent_pairing,
-)
-from src.methods.utils import load_yaml_config, load_data
+from src.methods.utils import load_data
 import src.methods.logging_library as log
 from src.methods.selection_methods import (
     roulette_selection,
@@ -22,8 +18,8 @@ SELECTION_METHODS = {
     "rank": linear_rank_selection,
 }
 CROSSOVER_METHODS = {
-    "one": single_crossover_batched,
-    "two": double_crossover_batched,
+    "one": Reproduction.single_crossover,
+    "two": Reproduction.double_crossover,
 }
 
 
@@ -106,13 +102,9 @@ class EvolutionRunner:
             parent_pool = self.selection_function(
                 fitness_arr=self.fitness, config=self.config
             )
-            parent_pairs = parent_pairing(parent_pool=parent_pool, config=self.config)
-            self.crossover_function(
-                parent_pairs=parent_pairs,
-                config=self.config,
-                paths=self.paths,
-                pop_manager=self.population_manager,
-            )
+            crossover = Reproduction(parent_pool, self.config, self.paths, self.population_manager)
+            method_name = self.crossover_function.__name__
+            getattr(crossover, method_name)()
             self._clean_children()
             self.population_manager.open_pop()
             self.fitness = calc_fitness_score_batched(

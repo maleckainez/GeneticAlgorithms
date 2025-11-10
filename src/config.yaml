@@ -4,12 +4,12 @@
 
 # --- DATA AND FILEPATHS ---
 data:
-  filename: "knapPI_1_10000_1000_1"   # Filename without path from "dane AG 2" file
+  filename: "f1_l-d_kp_10_269"   # Filename without path from "dane AG 2" file
   max_weight: 1000                  # Max weight threshold for GA
 
 # --- POPULATION PARAMETERS ---
 population:
-  size: 1000000                        # population_size (N)
+  size: 10000                        # population_size (N)
   generations: 500                  # generations (number of algorithm's iterations)
   stream_batch_size: 500            # stream_batch_size (size of memory i/o batch)
 
@@ -19,13 +19,13 @@ selection:
 
 # --- GENETIC OPERATORS ---
 genetic_operators:
-  crossover_type: "one"             # Type of crossover method [one, two] (points of slicing)
+  crossover_type: "two"             # Type of crossover method [one, two] (points of slicing)
   crossover_probability: 0.7        # Probability of crossover occurrence (Pc)
   mutation_probability: 0        # Probability of mutation occurrence (Pm)
   penalty_percentage: 1             # Penalty factor applied after exceeding threshold weight
 
 # --- EXPERIMENT VARIABLES ---
 experiment:
-  seed: null                        # Predefined RNG seed (if null, rng will be defined randomly)
+  seed: 2137                        # Predefined RNG seed (if null, rng will be defined randomly)
   identifier: 0                     # Experiment identifier (will be defined in next versions)
   log_level: INFO                   # Level of logged events [DEBUG, INFO, WARNING, ERROR, CRITICAL]
