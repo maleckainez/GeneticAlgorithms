@@ -45,7 +45,7 @@ class PopulationHandler:
 
     def open_pop(self, open_mode: str = "r") -> None:
         if self.pop_handle is None:
-            self.pop_handle = load_memmap(
+            self.pop_handle, _ = load_memmap(
                 filename_constant=self.filename_constant,
                 open_mode=open_mode,
                 temp=self.temp_path,

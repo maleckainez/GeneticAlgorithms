@@ -9,18 +9,23 @@ data:
 
 # --- POPULATION PARAMETERS ---
 population:
-  size: 5000                        # population_size (N)
-  generations: 200                  # generations (number of algorithm's iterations)
+  size: 50000                        # population_size (N)
+  generations: 500                  # generations (number of algorithm's iterations)
   stream_batch_size: 500            # stream_batch_size (size of memory i/o batch)
+
+# --- SELECTION MODIFIER ---
+selection:
+  type: "tournament"             # Type of parent selection [roulette, tournament, rank]
 
 # --- GENETIC OPERATORS ---
 genetic_operators:
+  crossover_type: "one"             # Type of crossover method [one, two] (points of slicing)
   crossover_probability: 0.8        # Probability of crossover occurrence (Pc)
   mutation_probability: 0.01        # Probability of mutation occurrence (Pm)
-  penalty_percentage: 1             # Penalty factor applied after exceeding threshold weight
+  penalty_percentage: 0.3             # Penalty factor applied after exceeding threshold weight
 
 # --- EXPERIMENT VARIABLES ---
 experiment:
   seed: null                        # Predefined RNG seed (if null, rng will be defined randomly)
-  identifier: 2                     # Experiment identifier (will be defined in next versions)
-  log_level: DEBUG                   # Level of logged events [DEBUG, INFO, WARNING, ERROR, CRITICAL]
+  identifier: 0                     # Experiment identifier (will be defined in next versions)
+  log_level: INFO                   # Level of logged events [DEBUG, INFO, WARNING, ERROR, CRITICAL]

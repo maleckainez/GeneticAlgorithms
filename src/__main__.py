@@ -107,7 +107,7 @@ for i in range(1, ITERATIONS + 1):
         filename_constant=experiment_name
     )
     parent_pool = tournament_selection(
-        fitness_score=fitness,
+        fitness_arr=fitness,
         rng=rng,
         population_file_config=population_file_config,
     )

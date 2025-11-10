@@ -9,6 +9,8 @@ class ExperimentConfig:
     generations: int
     max_weight: int
     seed: int | None
+    selection_type: str
+    crossover_type: str
     crossover_probability: float
     mutation_probability: float
     penalty: float

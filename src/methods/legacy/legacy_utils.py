@@ -111,3 +111,107 @@ def log_output(
                 best_chromosomes.writelines(
                     f"No chromosome for iteration {iteration} with fitness higher than 0\n"
                 )
+
+
+# DEPRECATED
+def single_crossover(
+    parent_pairs: np.ndarray[tuple[int, int]],
+    rng: np.random.Generator,
+    population_file_handle: np.memmap,
+    population_file_config: dict[str, any],
+    crossover_probability: float = 1,
+    mutation_probability: float = 0.1,
+) -> None:
+    # TODO: docstrings, make the method more modular
+    TEMP = find_temp_directory()
+    CHILDREN_DAT = TEMP / "children_temp.dat"
+    children = np.memmap(
+        CHILDREN_DAT,
+        dtype=np.uint8,
+        mode="w+",
+        shape=(
+            population_file_config["population_size"],
+            population_file_config["genome_length"],
+        ),
+    )
+    for i in range(len(parent_pairs)):
+        index_paren1, index_parent2 = parent_pairs[i]
+        p1 = population_file_handle[index_paren1]
+        p2 = population_file_handle[index_parent2]
+        if rng.random() <= crossover_probability:
+            cut_place = rng.integers(0, population_file_config["genome_length"])
+            children[2 * i] = mutation(
+                child=np.concatenate((p1[:cut_place], p2[cut_place:])),
+                mutation_probability=mutation_probability,
+                rng=rng,
+                genome_length=population_file_config["genome_length"],
+            )
+            children[(2 * i) + 1] = mutation(
+                child=np.concatenate((p2[:cut_place], p1[cut_place:])),
+                mutation_probability=mutation_probability,
+                rng=rng,
+                genome_length=population_file_config["genome_length"],
+            )
+        else:
+            children[(2 * i)] = mutation(
+                child=p1,
+                mutation_probability=mutation_probability,
+                rng=rng,
+                genome_length=population_file_config["genome_length"],
+            )
+            children[(2 * i) + 1] = mutation(
+                child=p2,
+                mutation_probability=mutation_probability,
+                rng=rng,
+                genome_length=population_file_config["genome_length"],
+            )
+        children.flush()
+
+
+# DEPRECATED
+def fitness_proportionate_selection(
+    fitness_score: np.ndarray,
+    rng: np.random.Generator,
+    population_file_config: dict[str, any],
+) -> list[int]:
+    # TODO: docstring
+    fitness_sum = 0
+    fitness_proportionate = np.ndarray(
+        shape=(population_file_config["population_size"], 1), dtype=np.float64
+    )
+    for i in range(population_file_config["population_size"]):
+        fitness_sum += fitness_score[i][0]
+    if fitness_sum == 0:
+        for i in range(population_file_config["population_size"]):
+            fitness_sum += 1
+            fitness_score[i][0] = 1
+    for i in range(population_file_config["population_size"]):
+        fitness_proportionate[i] = fitness_score[i][0] / fitness_sum
+    proportionate_cfd = np.cumsum(fitness_proportionate.flatten())
+    proportionate_cfd[-1] = 1
+    r = rng.random(population_file_config["population_size"])
+    return np.searchsorted(proportionate_cfd, r).tolist()
+
+
+def create_children_temp(population_file_config: dict[str, any]):
+    TEMP = find_temp_directory()
+    CHILDREN_DAT = TEMP / "children_temp.dat"
+    children = np.memmap(
+        CHILDREN_DAT,
+        dtype=np.uint8,
+        mode="w+",
+        shape=(
+            population_file_config["population_size"],
+            population_file_config["genome_length"],
+        ),
+    )
+    return children
+
+
+def clean_children_temp(
+    population_file_config: dict[str, any],
+):
+    TEMP = find_temp_directory()
+    CHILDREN_DAT = TEMP / "children_temp.dat"
+    os.remove(population_file_config["filename"])
+    os.rename(CHILDREN_DAT, population_file_config["filename"])

@@ -40,10 +40,11 @@ def initialize(config: ExperimentConfig, paths: PathResolver):
     return main_logger
 
 
-def generation(logger: Logger, best_idx: int, best_score: int, weight: int):
+def generation(
+    logger: Logger, best_idx: int, best_score: int, weight: int, iteration: int
+):
     logger.info(
-        f"Population created successfully as iteration 0\n"
-        f"Generation 0: \n"
+        f"Generation {iteration}: \n"
         f"      Index of best individual: {best_idx}\n"
         f"      Fitness of best individual: {best_score}\n"
         f"      Weight of best individual: {weight}\n"
