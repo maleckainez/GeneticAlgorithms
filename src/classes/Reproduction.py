@@ -57,8 +57,8 @@ class Reproduction:
         start_cut_col = self.rng.integers(1, genome_length-1, size=batch_size)
         stop_cut_col = self.rng.integers(start_cut_col+1, genome_length, size=batch_size)
         column_index = np.arange(genome_length)
-        cut_mask = (column_index[None,:] >= start_cut_col) & (column_index[None,:] < stop_cut_col[:,None])
-        cut_mask &= mask
+        cut_mask = (column_index[None,:] >= start_cut_col[:,None]) & (column_index[None,:] < stop_cut_col[:,None])
+        cut_mask &= mask[:,None]
         c1[cut_mask] = p2[cut_mask]
         c2[cut_mask] = p1[cut_mask]
         return c1, c2
@@ -74,7 +74,7 @@ class Reproduction:
             mask = (
                 self.rng.random(size=stop - start) < self.crossover_probability
             )
-            c1, c2 = kernel(c1, c2, p1, p2, mask, parent_indices)
+            c1, c2 = kernel(c1, c2, p1, p2, mask)
             if self.mutation_probability > 0:
                 self._mutation(c1, c2)
             self.children[start * 2 : stop * 2] = np.concatenate(
