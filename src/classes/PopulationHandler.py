@@ -53,6 +53,8 @@ class PopulationHandler:
 
     def close(self):
         if self.pop_handle is not None:
-            self.pop_handle.flush()
-            del self.pop_handle
+            h = self.pop_handle
             self.pop_handle = None
+            h.flush()
+            del h
+            import gc; gc.collect

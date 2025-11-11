@@ -29,6 +29,8 @@ class ChildrenHandler:
 
     def close(self):
         if self.children_handle is not None:
-            self.children_handle.flush()
-            del self.children_handle
+            h = self.children_handle
             self.children_handle = None
+            h.flush()
+            del h
+            import gc; gc.collect

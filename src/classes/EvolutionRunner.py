@@ -124,5 +124,5 @@ class EvolutionRunner:
 
     def _clean_children(self):
         self.population_manager.close()
-        self.paths.clean_children_temp()
+        self.paths.commit_children()
 

@@ -67,10 +67,19 @@ class PathResolver:
     def get_children_filepath(self):
         return self.temp_dir / f"child_{self.filename_constant}.dat"
 
-    def clean_children_temp(self):
-        if Path(self.temp_dir / f"child_{self.filename_constant}.dat").exists():
-            os.remove(self.temp_dir / f"{self.filename_constant}.dat")
-            os.rename(
-                src=Path(self.temp_dir / f"child_{self.filename_constant}.dat"),
-                dst=Path(self.temp_dir / f"{self.filename_constant}.dat"),
-            )
+    def commit_children(self, expected_size: int, retries: int=10):
+        child = self.get_children_filepath
+        population = self.get_temp_path / f"{self.filename_constant}.dat"
+        if not child.exists():
+            raise RuntimeError(f"Missing children file {child}")
+        if child.stat().st_size != expected_size:
+            raise RuntimeError(f"Children size mismatch: {child.stat().st_size} =/= {expected_size}")
+        last_error = None
+        for _ in range(retries):
+            try:
+                os.replace(child, population)
+                return
+            except PermissionError as err:
+                last_error = err
+                time.sleep(0.2)
+        raise RuntimeError(f"Commit failed after {retries} tries.\nDst: {population}\nSrc: {child}\nWith error: {last_error}")
