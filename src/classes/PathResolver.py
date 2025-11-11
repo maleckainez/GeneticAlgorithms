@@ -2,6 +2,7 @@ import os
 import shutil
 from pathlib import Path
 from shutil import rmtree
+import time
 
 
 class PathResolver:
@@ -68,8 +69,8 @@ class PathResolver:
         return self.temp_dir / f"child_{self.filename_constant}.dat"
 
     def commit_children(self, expected_size: int, retries: int=10):
-        child = self.get_children_filepath
-        population = self.get_temp_path / f"{self.filename_constant}.dat"
+        child = self.get_children_filepath()
+        population =Path(self.temp_dir / f"{self.filename_constant}.dat")
         if not child.exists():
             raise RuntimeError(f"Missing children file {child}")
         if child.stat().st_size != expected_size:

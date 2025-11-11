@@ -91,7 +91,7 @@ def create_memmap_config_json(
         "data_type": np.dtype(datatype).name,
         "population_size": population_size,
         "genome_length": genome_length,
-        "filesize": population_size * genome_length,
+        "filesize": population_size * genome_length * np.dtype(datatype).itemsize,
     }
     with open(path, "w") as file:
         json.dump(config, file, indent=4)

@@ -124,5 +124,7 @@ class EvolutionRunner:
 
     def _clean_children(self):
         self.population_manager.close()
-        self.paths.commit_children()
+        pop_config = self.population_manager.get_pop_config()
+        filesize = pop_config["filesize"]
+        self.paths.commit_children(expected_size=filesize, retries=100)
 
