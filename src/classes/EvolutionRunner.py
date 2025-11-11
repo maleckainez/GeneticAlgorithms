@@ -11,6 +11,7 @@ from src.methods.selection_methods import (
     tournament_selection,
     linear_rank_selection,
 )
+from src.classes.ChildrenHandler import ChildrenHandler
 
 SELECTION_METHODS = {
     "roulette": roulette_selection,
@@ -102,10 +103,11 @@ class EvolutionRunner:
             parent_pool = self.selection_function(
                 fitness_arr=self.fitness, config=self.config
             )
-            crossover = Reproduction(parent_pool, self.config, self.paths, self.population_manager)
+            children_manager = ChildrenHandler(config=self.config, paths=self.paths, genome_length=self.population_manager.genome_length)
+            crossover = Reproduction(parent_pool, self.config, self.paths)
             method_name = self.crossover_function.__name__
-            getattr(crossover, method_name)()
-            self._clean_children()
+            getattr(crossover, method_name)(self.population_manager, children_manager)
+            self._clean_children(children_manager)
             self.population_manager.open_pop()
             self.fitness = calc_fitness_score_batched(
                 value_weight_arr=self.value_weight_array,
@@ -122,9 +124,10 @@ class EvolutionRunner:
                 iteration=iteration,
             )
 
-    def _clean_children(self):
+    def _clean_children(self, children_manager: ChildrenHandler):
+        children_manager.close()
         self.population_manager.close()
         pop_config = self.population_manager.get_pop_config()
         filesize = pop_config["filesize"]
-        self.paths.commit_children(expected_size=filesize, retries=100)
+        self.paths.commit_children(expected_size=filesize)
 
