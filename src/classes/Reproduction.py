@@ -41,34 +41,26 @@ class Reproduction:
         )
         self.children = self.children_manager.get_children_handle()
 
-    def _kernel_single(self, c1, c2, p1, p2, mask, parent_indices):
-        crossover_points = self.rng.integers(
-            1, self.children.shape[1], size=len(parent_indices)
-        )
-        for i in range(len(parent_indices)):
-            if mask[i]:
-                cut_point = crossover_points[i]
-                c1[i, cut_point:] = p2[i, cut_point:]
-                c2[i, cut_point:] = p1[i, cut_point:]
+    def _kernel_single(self, c1, c2, p1, p2, mask):
+        batch_size, genome_length = c1.shape
+        cut_columns = self.rng.integers(1, genome_length, size=batch_size)
+        column_index = np.arange(genome_length)
+
+        cut_mask = column_index[None,:] >= cut_columns[:, None]
+        cut_mask &= mask[:,None]
+        c1[cut_mask] = p2[cut_mask]
+        c2[cut_mask] = p1[cut_mask]
         return c1, c2
 
-    def _kernel_double(self, c1, c2, p1, p2, mask, parent_indices):
-        first_crossover_points = self.rng.integers(
-            1, c1.shape[1] - 1, size=len(parent_indices)
-        )
-        second_crossover_points = self.rng.integers(
-            first_crossover_points + 1, c1.shape[1], size=len(parent_indices)
-        )
-        crossover_points = np.column_stack(
-            (first_crossover_points, second_crossover_points)
-        )
-        for i in range(len(parent_indices)):
-            if mask[i]:
-                first_cut_point, second_cut_point = crossover_points[i]
-                c1[i, first_cut_point:] = p2[i, first_cut_point:]
-                c1[i, second_cut_point:] = p1[i, second_cut_point:]
-                c2[i, first_cut_point:] = p1[i, first_cut_point:]
-                c2[i, second_cut_point:] = p2[i, second_cut_point:]
+    def _kernel_double(self, c1, c2, p1, p2, mask):
+        batch_size, genome_length = c1.shape
+        start_cut_col = self.rng.integers(1, genome_length-1, size=batch_size)
+        stop_cut_col = self.rng.integers(start_cut_col+1, genome_length, size=batch_size)
+        column_index = np.arange(genome_length)
+        cut_mask = (column_index[None,:] >= start_cut_col) & (column_index[None,:] < stop_cut_col[:,None])
+        cut_mask &= mask
+        c1[cut_mask] = p2[cut_mask]
+        c2[cut_mask] = p1[cut_mask]
         return c1, c2
 
     def _calculation_runner(self, kernel):
@@ -92,9 +84,8 @@ class Reproduction:
         self.children_manager.close()
 
     def _mutation(self, c1, c2):
-            mask1 = (self.rng.random(size=c1.shape) < self.mutation_probability)
-            mask2 = (self.rng.random(size=c2.shape) < self.mutation_probability)
-            c1[mask1] ^= 1
-            c2[mask2] ^= 1
-            return c1, c2
-
+        mask1 = (self.rng.random(size=c1.shape) < self.mutation_probability)
+        mask2 = (self.rng.random(size=c2.shape) < self.mutation_probability)
+        c1[mask1] ^= 1
+        c2[mask2] ^= 1
+        return c1, c2
