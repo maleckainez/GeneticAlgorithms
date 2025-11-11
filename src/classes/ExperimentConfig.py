@@ -20,6 +20,8 @@ class ExperimentConfig:
     rng: np.random.Generator | None = None
 
     def __post_init__(self):
+        if self.population_size %2 != 0:
+            raise ValueError("Population has to be even!")
         if self.crossover_probability > 1 or self.crossover_probability < 0:
             raise ValueError("Crossover_probability must be between 0 and 1")
         if self.mutation_probability > 1 or self.mutation_probability < 0:

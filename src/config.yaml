@@ -21,8 +21,8 @@ selection:
 genetic_operators:
   crossover_type: "two"             # Type of crossover method [one, two] (points of slicing)
   crossover_probability: 0.7        # Probability of crossover occurrence (Pc)
-  mutation_probability: 0.2        # Probability of mutation occurrence (Pm)
-  penalty_percentage: 1             # Penalty factor applied after exceeding threshold weight
+  mutation_probability: 0.2         # Probability of mutation occurrence (Pm)
+  penalty_multiplier: 0             # Penalty factor applied after exceeding threshold weight (0 - nullifies fitness if weight exceeded)
 
 # --- EXPERIMENT VARIABLES ---
 experiment:

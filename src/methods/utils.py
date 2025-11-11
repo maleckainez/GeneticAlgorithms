@@ -163,7 +163,7 @@ def load_yaml_config(filepath: Path | str) -> dict:
             "crossover_probability"
         ],
         "mutation_probability": yaml_file["genetic_operators"]["mutation_probability"],
-        "penalty": yaml_file["genetic_operators"]["penalty_percentage"],
+        "penalty": yaml_file["genetic_operators"]["penalty_multiplier"],
         "seed": yaml_file["experiment"]["seed"],
         "experiment_identifier": yaml_file["experiment"]["identifier"],
         "log_level": yaml_file["experiment"]["log_level"],

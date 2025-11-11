@@ -27,11 +27,11 @@ def calc_fitness_score_batched(
         calculated_scores = current_batch @ value
         calculated_weights = current_batch @ weight
         over_limit_mask = calculated_weights > max_weight
-        if penalty_factor == 1:
+        if penalty_factor == 0:
             penalty_value = calculated_scores
         else:
             penalty_value = np.maximum(0, (calculated_weights - max_weight) * (
-                penalty_factor * 10)
+                penalty_factor)
             )
         penalized_score = np.where(
             over_limit_mask,
