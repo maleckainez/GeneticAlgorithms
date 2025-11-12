@@ -34,6 +34,25 @@ def tournament_selection(
         selected_parents.append(int(gladiators[winner]))
     return selected_parents
 
-
-def linear_rank_selection():
+def _tournament_tie_breaker(gladiators: list[int],
+                            fitness_arr: np.ndarray):
     raise NotImplementedError()
+
+def linear_rank_selection(
+        fitness_arr: np.ndarray,
+        config: ExperimentConfig
+):  
+    selective_pressure = 2
+    SP = selective_pressure
+    #Consider Nind the number of individuals in the population, Pos the position of an individual in this population 
+    # (least fit individual has Pos=1, the fittest individual Pos=Nind) and SP the selective pressure. 
+    # The fitness value for an individual is calculated as:
+    # Fitess(pos) = 2 - SP + 2*(SP-1)*((pos-1)/Nind-1)
+    print(_calc_pressured_fitness(SP, fitness_arr))
+
+def _calc_pressured_fitness(SP:float,fitness_arr:np.ndarray):
+    ascending_sorted_idxes = np.lexsort((-fitness_arr[:,1], fitness_arr[:,0]))
+    length = len(ascending_sorted_idxes)
+    positions = np.arange(1, length+1)
+    pressured_fitness = 2-SP + 2*(SP-1) *((positions-1)/(length-1))
+    return pressured_fitness
