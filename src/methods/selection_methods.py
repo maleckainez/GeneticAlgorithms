@@ -43,7 +43,7 @@ def _tournament_tie_breaker(gladiators: list[int], fitness_arr: np.ndarray):
 
 def linear_rank_selection(fitness_arr: np.ndarray, config: ExperimentConfig):
     rng = config.rng
-    SP = 2
+    SP = config.selection_pressure
     sorted_idx = np.lexsort((-fitness_arr[:, 1], fitness_arr[:, 0]))
     ranks = np.zeros(shape=fitness_arr.shape[0], dtype=np.int64)
     n = len(fitness_arr)
