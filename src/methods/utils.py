@@ -158,6 +158,7 @@ def load_yaml_config(filepath: Path | str) -> dict:
         "generations": yaml_file["population"]["generations"],
         "stream_batch_size": yaml_file["population"]["stream_batch_size"],
         "selection_type": yaml_file["selection"]["type"],
+        "selection_pressure": yaml_file["selection"]["selection_pressure"],
         "crossover_type": yaml_file["genetic_operators"]["crossover_type"],
         "crossover_probability": yaml_file["genetic_operators"][
             "crossover_probability"

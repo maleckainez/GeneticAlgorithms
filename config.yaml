@@ -15,7 +15,8 @@ population:
 
 # --- SELECTION MODIFIER ---
 selection:
-  type: "tournament"             # Type of parent selection [roulette, tournament, rank]
+  type: "tournament"              # Type of parent selection [roulette, tournament, rank]
+  selection_pressure: 1                           # Only applicable for rank selection in range [1 - 2] (float)
 
 # --- GENETIC OPERATORS ---
 genetic_operators:

@@ -18,6 +18,7 @@ class ExperimentConfig:
     log_level: str
     stream_batch_size: int | None = None
     rng: np.random.Generator | None = None
+    selection_pressure: float | None = None
 
     def __post_init__(self):
         if self.population_size %2 != 0:
@@ -39,6 +40,11 @@ class ExperimentConfig:
                 object.__setattr__(self, "rng", np.random.default_rng())
             else:
                 object.__setattr__(self, "rng", np.random.default_rng(self.seed))
+        if self.selection_type == "rank":
+            if self.selection_pressure is not float:
+                object.__setattr__(self,"selection_pressure", 1)
+            if self.selection_pressure < 1 or self.selection_pressure > 2:
+                raise ValueError("Selection pressure must be float in range from 1 to 2")
 
     def generate_probability_of_failure(self, weight_sum: int) -> float:
         if weight_sum < 1:
