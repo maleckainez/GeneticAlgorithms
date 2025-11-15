@@ -13,3 +13,5 @@
 *.log
 *.dat
 *.json
+run_output
+*.png
