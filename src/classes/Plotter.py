@@ -37,6 +37,7 @@ class Plotter:
         best_weight: int,
         avg_fitness: float,
         identical_best_count: int,
+        genome: str,
     ):
         if self.writer is None:
             raise RuntimeError("Plotter not opened. Call .open() or .init_csv() first.")
@@ -47,6 +48,7 @@ class Plotter:
                 best_weight,
                 avg_fitness,
                 identical_best_count,
+                genome,
             ]
         )
 
@@ -77,6 +79,7 @@ class Plotter:
             "best_weight",
             "avg_fitness",
             "identical_best_count",
+            "genome_of_best_individual"
         ]
 
         self.writer.writerows(meta_rows)

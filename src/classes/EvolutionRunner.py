@@ -145,10 +145,14 @@ class EvolutionRunner:
             iteration=iteration,
             repetitions=repetitions
         )
+        population = self.population_manager.get_pop_handle()
+        best_item = ''.join(str(char) for char in population[best_idx].tolist())
+
         self.plotter.write_iteration(
             iteration=iteration,
             best_fitness= best_score,
             best_weight= weight,
             avg_fitness= np.mean(self.fitness[:,0]),
-            identical_best_count= repetitions
+            identical_best_count= repetitions,
+            genome= best_item,
         )
