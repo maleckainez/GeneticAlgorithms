@@ -13,7 +13,7 @@ class Plotter:
                  config = ExperimentConfig):
         self.config = config
         self.pr = pr
-        self.path = pr.get_plot_path()
+        self.plot_path = pr.get_plot_path()
         self.input_path = pr.get_output_path()
         self.filename = Path( self.input_path / f"{pr.filename_constant}.csv")
         self.file = None
@@ -139,7 +139,7 @@ class Plotter:
         fig.tight_layout()
         plt.subplots_adjust(bottom=0.25)
 
-        fig.savefig("inez.png")
+        fig.savefig(Path(self.plot_path)/"best_and_avg_pop_fitness.png")
         plt.close(fig)
 
     def best_fitness_v_optimum(self):
@@ -186,5 +186,5 @@ class Plotter:
         fig.tight_layout()
         plt.subplots_adjust(bottom=0.25)
 
-        fig.savefig("inez2.png")
+        fig.savefig(Path(self.plot_path)/"best_fitness_v_optimal.png")
         plt.close(fig)
