@@ -53,7 +53,7 @@ def linear_rank_selection(fitness_arr: np.ndarray, config: ExperimentConfig):
     # The fitness value for an individual is calculated as:
     # Fitess(pos) = 2 - SP + 2*(SP-1)*((pos-1)/Nind-1)
 
-    fitness_rank = 2 - SP + 2 * (SP - 1) * (ranks - 1) / (n)
+    fitness_rank = 2 - SP + 2 * (SP - 1) * (ranks - 1) / (n-1)
     probability_distribution = fitness_rank / n
     # distribution safeguard
     probability_distribution = probability_distribution / probability_distribution.sum()
