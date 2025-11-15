@@ -14,6 +14,7 @@ from src.methods.selection_methods import (
     linear_rank_selection,
 )
 from src.classes.ChildrenHandler import ChildrenHandler
+from src.classes.Plotter import Plotter
 
 SELECTION_METHODS = {
     "roulette": roulette_selection,
@@ -62,6 +63,9 @@ class EvolutionRunner:
 
         self.logger = log.initialize(config=self.config, paths=self.paths)
 
+        self.plotter = Plotter(self.paths, self.config)
+        self.plotter.init_csv(self.config)
+
     def _initialize_first_generation(self):
         self.population_manager = PopHandler(
             config=self.config,
@@ -75,16 +79,9 @@ class EvolutionRunner:
             config=self.config,
             pop_manager=self.population_manager,
         )
-        best_idx, best_score, weight, repetitions = self._get_best_individual()
         self.logger.info(f"Population created successfully as iteration 0")
-        log.generation(
-            logger=self.logger,
-            best_idx=best_idx,
-            best_score=best_score,
-            weight=weight,
-            iteration=0,
-            repetitions=repetitions
-        )
+        self._log_and_save(iteration=0)
+
 
     def _load_strategies(self):
         selection_type = self.config.selection_type
@@ -101,30 +98,28 @@ class EvolutionRunner:
         self.logger.info(f"{crossover_type} crossover method was chosen.")
 
     def evolve(self):
-        for iteration in range(1, self.generations+1):
-            parent_pool = self.selection_function(
-                fitness_arr=self.fitness, config=self.config
-            )
-            children_manager = ChildrenHandler(config=self.config, paths=self.paths, genome_length=self.population_manager.genome_length)
-            crossover = Reproduction(parent_pool, self.config, self.paths)
-            method_name = self.crossover_function.__name__
-            getattr(crossover, method_name)(self.population_manager, children_manager)
-            self._clean_children(children_manager)
-            self.population_manager.open_pop()
-            self.fitness = calc_fitness_score_batched(
-                value_weight_arr=self.value_weight_array,
-                config=self.config,
-                pop_manager=self.population_manager,
-            )
-            best_idx, best_score, weight, repetitions = self._get_best_individual()
-            log.generation(
-                logger=self.logger,
-                best_idx=best_idx,
-                best_score=best_score,
-                weight=weight,
-                iteration=iteration,
-                repetitions=repetitions,
-            )
+        try:
+            for iteration in range(1, self.generations+1):
+                parent_pool = self.selection_function(
+                    fitness_arr=self.fitness, config=self.config
+                )
+                children_manager = ChildrenHandler(config=self.config, paths=self.paths, genome_length=self.population_manager.genome_length)
+                crossover = Reproduction(parent_pool, self.config, self.paths)
+                method_name = self.crossover_function.__name__
+                getattr(crossover, method_name)(self.population_manager, children_manager)
+                self._clean_children(children_manager)
+                self.population_manager.open_pop()
+                self.fitness = calc_fitness_score_batched(
+                    value_weight_arr=self.value_weight_array,
+                    config=self.config,
+                    pop_manager=self.population_manager,
+                )
+                self._log_and_save(iteration)
+        finally:
+            self.plotter.close()
+            self.plotter.best_fitness_plot()
+            self.plotter.best_fitness_v_optimum()
+
     def _get_best_individual(self):
         sorted_fitness_descending = np.lexsort((self.fitness[:,1], -self.fitness[:,0]))
         best_idx = sorted_fitness_descending[0]
@@ -139,3 +134,21 @@ class EvolutionRunner:
         pop_config = self.population_manager.get_pop_config()
         filesize = pop_config["filesize"]
         self.paths.commit_children(expected_size=filesize)
+
+    def _log_and_save(self, iteration:int):
+        best_idx, best_score, weight, repetitions = self._get_best_individual()
+        log.generation(
+            logger=self.logger,
+            best_idx=best_idx,
+            best_score=best_score,
+            weight=weight,
+            iteration=iteration,
+            repetitions=repetitions
+        )
+        self.plotter.write_iteration(
+            iteration=iteration,
+            best_fitness= best_score,
+            best_weight= weight,
+            avg_fitness= np.mean(self.fitness[:,0]),
+            identical_best_count= repetitions
+        )

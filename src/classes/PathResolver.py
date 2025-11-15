@@ -15,10 +15,10 @@ class PathResolver:
         self.logging_dir: Path | None = None
         self.plot_dir: Path | None = None
 
-        self.small_scale_path = (
-            Path(self.PROJECT_ROOT) / "dane AG 2" / "low-dimensional"
-        )
+        self.small_scale_path = Path(self.PROJECT_ROOT) / "dane AG 2" / "low-dimensional"
+        self.small_scale_optimum = Path(self.PROJECT_ROOT) / "dane AG 2" / "low-dimensional-optimum"
         self.large_scale_path = Path(self.PROJECT_ROOT) / "dane AG 2" / "large_scale"
+        self.large_scale_optimum = Path(self.PROJECT_ROOT) / "dane AG 2" / "large_scale-optimum"
 
         self.data_path: Path | None = None
 
@@ -94,3 +94,11 @@ class PathResolver:
         if self.plot_dir is None:
             raise RuntimeError("Directories were not initialized")
         return self.plot_dir
+
+    def get_optimum_path(self):
+        if self.filename_constant.startswith("knap"):
+            return self.large_scale_optimum
+        elif self.filename_constant.startswith("f"):
+            return self.small_scale_optimum
+        else:
+            raise Exception("Invalid file name")
