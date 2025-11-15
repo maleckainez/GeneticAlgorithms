@@ -1,3 +1,5 @@
+import numpy as np
+
 from src.classes.ExperimentConfig import ExperimentConfig
 from src.classes.PathResolver import PathResolver
 from src.classes.PopulationHandler import PopulationHandler as PopHandler
@@ -73,8 +75,7 @@ class EvolutionRunner:
             config=self.config,
             pop_manager=self.population_manager,
         )
-        best_idx = self.fitness[:, 0].argmax()
-        best_score, weight = self.fitness[best_idx]
+        best_idx, best_score, weight, repetitions = self._get_best_individual()
         self.logger.info(f"Population created successfully as iteration 0")
         log.generation(
             logger=self.logger,
@@ -82,6 +83,7 @@ class EvolutionRunner:
             best_score=best_score,
             weight=weight,
             iteration=0,
+            repetitions=repetitions
         )
 
     def _load_strategies(self):
@@ -114,15 +116,22 @@ class EvolutionRunner:
                 config=self.config,
                 pop_manager=self.population_manager,
             )
-            best_idx = self.fitness[:, 0].argmax()
-            best_score, weight = self.fitness[best_idx]
+            best_idx, best_score, weight, repetitions = self._get_best_individual()
             log.generation(
                 logger=self.logger,
                 best_idx=best_idx,
                 best_score=best_score,
                 weight=weight,
                 iteration=iteration,
+                repetitions=repetitions,
             )
+    def _get_best_individual(self):
+        sorted_fitness_descending = np.lexsort((self.fitness[:,1], -self.fitness[:,0]))
+        best_idx = sorted_fitness_descending[0]
+        best_score, weight = self.fitness[best_idx]
+        mask = (self.fitness[:,0] == best_score) & (self.fitness[:,1] == weight)
+        number_of_identical_best = np.sum(mask)
+        return best_idx, best_score, weight, number_of_identical_best
 
     def _clean_children(self, children_manager: ChildrenHandler):
         children_manager.close()
@@ -130,4 +139,3 @@ class EvolutionRunner:
         pop_config = self.population_manager.get_pop_config()
         filesize = pop_config["filesize"]
         self.paths.commit_children(expected_size=filesize)
-
