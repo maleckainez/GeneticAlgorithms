@@ -1,5 +1,6 @@
 import numpy as np
 
+import src.methods.utils
 from src.classes.ExperimentConfig import ExperimentConfig
 from src.classes.PathResolver import PathResolver
 from src.classes.PopulationHandler import PopulationHandler as PopHandler
@@ -119,6 +120,8 @@ class EvolutionRunner:
             self.plotter.close()
             self.plotter.best_fitness_plot()
             self.plotter.best_fitness_v_optimum()
+            self.paths.cleanup_temp_dir()
+            src.methods.utils.final_screen()
 
     def _get_best_individual(self):
         sorted_fitness_descending = np.lexsort((self.fitness[:,1], -self.fitness[:,0]))
