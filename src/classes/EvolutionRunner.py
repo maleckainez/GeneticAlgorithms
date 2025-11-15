@@ -130,7 +130,7 @@ class EvolutionRunner:
         best_idx = sorted_fitness_descending[0]
         best_score, weight = self.fitness[best_idx]
         mask = (self.fitness[:,0] == best_score) & (self.fitness[:,1] == weight)
-        number_of_identical_best = np.sum(mask)
+        number_of_identical_best = np.sum(mask) - 1
         return best_idx, best_score, weight, number_of_identical_best
 
     def _clean_children(self, children_manager: ChildrenHandler):
