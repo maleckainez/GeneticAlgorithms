@@ -41,11 +41,12 @@ def initialize(config: ExperimentConfig, paths: PathResolver):
 
 
 def generation(
-    logger: Logger, best_idx: int, best_score: int, weight: int, iteration: int
+    logger: Logger, best_idx: int, best_score: int, weight: int, iteration: int, repetitions:int
 ):
     logger.info(
         f"Generation {iteration}: \n"
         f"      Index of best individual: {best_idx}\n"
         f"      Fitness of best individual: {best_score}\n"
         f"      Weight of best individual: {weight}\n"
+        f"      There were {repetitions} individuals with same scores"
     )
