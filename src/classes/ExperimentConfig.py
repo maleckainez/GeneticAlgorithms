@@ -41,7 +41,7 @@ class ExperimentConfig:
             else:
                 object.__setattr__(self, "rng", np.random.default_rng(self.seed))
         if self.selection_type == "rank":
-            if isinstance(self.selection_pressure, float):
+            if self.selection_pressure is None:
                 object.__setattr__(self,"selection_pressure", 1)
             if self.selection_pressure < 1 or self.selection_pressure > 2:
                 raise ValueError("Selection pressure must be float in range from 1 to 2")
