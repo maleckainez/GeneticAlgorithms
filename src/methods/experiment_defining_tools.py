@@ -8,6 +8,7 @@ def create_unique_experiment_name(
     config: ExperimentConfig,
     genome_length: int,
 ) -> str:
+    method = config.selection_type
     crossover = config.crossover_probability
     mutation = config.mutation_probability
     filename = config.data_filename
@@ -18,9 +19,10 @@ def create_unique_experiment_name(
 
     cr = re.sub(r"\.", "p", f"{crossover}")
     mr = re.sub(r"\.", "p", f"{mutation}")
-    fname = re.sub("[^A-Za-z0-9]+", "", filename)
+    fname = re.sub("[^A-Za-z0-9]+", "_", filename)
     parts = [
         fname,
+        method,
         f"PS{population_length}",
         f"GW{genome_length}",
         f"GE{number_of_generations}",
