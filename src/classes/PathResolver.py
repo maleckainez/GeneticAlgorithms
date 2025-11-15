@@ -13,6 +13,7 @@ class PathResolver:
         self.temp_dir: Path | None = None
         self.output_dir: Path | None = None
         self.logging_dir: Path | None = None
+        self.plot_dir: Path | None = None
 
         self.small_scale_path = (
             Path(self.PROJECT_ROOT) / "dane AG 2" / "low-dimensional"
@@ -31,10 +32,14 @@ class PathResolver:
         self.logging_dir = (
             Path(self.PROJECT_ROOT) / "run_output" / f"{filename_constant}" / "logs"
         )
+        self.plot_dir = (
+            Path(self.PROJECT_ROOT) / "run_output" / f"{filename_constant}" / "plots"
+        )
         self.filename_constant = filename_constant
         self.temp_dir.mkdir(parents=True, exist_ok=True)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.logging_dir.mkdir(parents=True, exist_ok=True)
+        self.plot_dir.mkdir(parents=True, exist_ok=True)
 
     def get_temp_path(self) -> Path:
         if self.temp_dir is None:
@@ -84,3 +89,8 @@ class PathResolver:
                 last_error = err
                 time.sleep(0.2)
         raise RuntimeError(f"Commit failed after {retries} tries.\nDst: {population}\nSrc: {child}\nWith error: {last_error}")
+
+    def get_plot_path(self):
+        if self.plot_dir is None:
+            raise RuntimeError("Directories were not initialized")
+        return self.plot_dir
