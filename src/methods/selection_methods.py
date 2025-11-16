@@ -1,5 +1,3 @@
-from unittest import findTestCases
-
 import numpy as np
 
 from src.classes.ExperimentConfig import ExperimentConfig

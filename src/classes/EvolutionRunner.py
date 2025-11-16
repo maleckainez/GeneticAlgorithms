@@ -119,6 +119,7 @@ class EvolutionRunner:
                 self._log_and_save(iteration)
         finally:
             self.csv_logger.close()
+            self.population_manager.close()
             self.paths.cleanup_temp_dir()
             plotter = Plotter(self.paths, self.config)
             plotter.performance_and_correctness()
