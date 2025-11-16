@@ -6,3 +6,44 @@ build-backend = "setuptools.build_meta"
 pythonpath = ["src"]
 testpaths = ["tests"]
 addopts = "-v"
+
+[project]
+name = "genetic-algorithms-uni-project"     
+version = "0.1.0"
+description = "Genetic algorithm experiments."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }              
+authors = [
+  { name = "Inez Małecka", email = "maleckainez@gmail.com" },
+]
+keywords = ["genetic algorithm", "knapsack", "optimization"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "matplotlib>=3.7",
+  "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "black>=25.9.0"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
