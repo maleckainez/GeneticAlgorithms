@@ -39,7 +39,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0",
-  "black>=25.9.0"
+  "black>=25.9.0",
+  "monkeypatch>=0.1rc3"
 ]
 
 [tool.setuptools]
