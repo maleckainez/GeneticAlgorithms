@@ -3,55 +3,49 @@ from pathlib import Path
 import json
 
 
-def _validate_population_file(pr, rng, func_name):
+def _validate_population_file(pr, rng, data):
+    # define variables
     temp_path = pr.get_temp_path()
     name = pr.filename_constant
-    assert temp_path.exists()
-    assert "pytest_temp_file" in str(temp_path)
-    func_name(temp_path, rng, name)
     mmap_file = Path(temp_path/f"{name}.dat")
     json_file = Path(temp_path/f"{name}.json")
+    # assert that PathResolver fixture worked properly
+    assert temp_path.exists()
+    assert "pytest_temp_file" in str(temp_path)
+    # create population using values from list
+    create_population_file(
+        population_size= data[0],
+        genome_length=data[1],
+        stream_batch=data[2],
+        rng=rng,
+        temp=temp_path,
+        filename_constant=name
+    )
+    # assert that datafile and json were created 
     assert mmap_file.exists()
     assert json_file.exists()
+    # assert that files are not corrupted (their weight is not null)
     assert mmap_file.stat().st_size != 0
     assert json_file.stat().st_size != 0
+    # load json config file
     with open(json_file, "r") as f:
         config = json.load(f)
     filesize = config["filesize"]
+    # assert that json and real filesize matches theoretical one
+    assert filesize == data[0]*data[1]
     assert filesize == mmap_file.stat().st_size
-
-def _small_pop(temp_path, rng, name):
-    create_population_file(
-        population_size=10,
-        genome_length= 10,
-        stream_batch= 500,
-        rng= rng,
-        temp= temp_path,
-        probability_of_failure= None,
-        filename_constant= name
-    )
-
-def _wide_pop(temp_path, rng, name):
-    create_population_file(
-        population_size=10,
-        genome_length= 10000,
-        stream_batch= 1,
-        rng= rng,
-        temp= temp_path,
-        probability_of_failure= None,
-        filename_constant= name
-    )
-
 
 
 def test_create_small_pop(test_only_pathresolver, test_only_rng):
     _validate_population_file(
         pr=test_only_pathresolver, 
-        rng=test_only_rng, 
-        func_name=_small_pop)
+        rng=test_only_rng,
+        data=[10,10,10]
+        )
     
 def test_create_wide_pop(test_only_pathresolver, test_only_rng):
     _validate_population_file(
         pr=test_only_pathresolver, 
-        rng=test_only_rng, 
-        func_name=_wide_pop)
+        rng=test_only_rng,
+        data=[10,10000,10])
+    
