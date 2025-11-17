@@ -2,10 +2,10 @@
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.pytest.ini_options]
-pythonpath = ["src"]
+[tool.pytest]
 testpaths = ["tests"]
-addopts = "-v"
+pythonpath = ["src"]
+addopts = ["-v"]
 
 [project]
 name = "genetic-algorithms-uni-project"     
@@ -43,8 +43,6 @@ dev = [
   "monkeypatch>=0.1rc3"
 ]
 
-[tool.setuptools]
-package-dir = {"" = "src"}
-
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."] 
+include = ["src*"] 
