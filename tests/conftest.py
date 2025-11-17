@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+from pathlib import Path
 
 @pytest.fixture
 def test_only_pathresolver(tmp_path, monkeypatch):
@@ -19,6 +20,12 @@ def test_only_rng():
 
 @pytest.fixture
 def root_path():
-    from pathlib import Path
     root_path = Path(__file__).resolve().parents[1]
     return root_path
+
+@pytest.fixture
+def temp_file(test_only_pathresolver):
+    temp_dir = test_only_pathresolver.get_temp_path()
+    temp_filename = test_only_pathresolver.filename_constant
+    temp_file = Path(temp_dir/temp_filename)
+    return temp_file
