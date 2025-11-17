@@ -15,6 +15,7 @@ The project allows running experiments with different configurations, logging re
 - Development (optional):
   - `pytest`
   - `black`
+  - `monkeypatch`
 
 ## Installation
 
