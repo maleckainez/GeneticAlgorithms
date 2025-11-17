@@ -1,3 +1,4 @@
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) 
 # Genetic Algorithms – Knapsack Problem
 
 Implementation of genetic algorithms for classic knapsack benchmark instances (from the `dane AG 2` dataset).  
