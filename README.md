@@ -29,16 +29,17 @@ These instructions assume that you have Python ≥ 3.10 and `git` installed.
 
 2. Create and activate a virtual environment:
 
-   ```bash
-   python -m venv .venv
-    
-   # Windows:
-   .\.venv\Scripts\activate
-
-   # Linux/macOS:
-   .venv/bin/activate
-   ```
-
+    ```bash
+    python -m venv .venv
+    ```
+    ```bash
+    # Windows:
+    .venv\Scripts\activate
+    ```
+    ```bash
+    # Linux/macOS:
+    .venv/bin/activate
+    ```
 3. Install the project with its dependencies:
 
    ```bash
