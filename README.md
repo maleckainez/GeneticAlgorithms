@@ -1,4 +1,8 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) 
+# ***!!! This branch is main development branch without any stable version yet !!!***
+**It will be merged into main branch when the first stable version appears**
+
+
 # Genetic Algorithms – Knapsack Problem
 
 Implementation of genetic algorithms for classic knapsack benchmark instances (from the `dane AG 2` dataset).  
@@ -29,7 +33,12 @@ These instructions assume that you have Python ≥ 3.10 and `git` installed.
    cd GeneticAlgorithms
    ```
 
-2. Create and activate a virtual environment:
+2. Checkout to this (development) branch:
+    ```bash
+    git checkout origin/feature/genetic-algorithm
+    ```
+
+3. Create and activate a virtual environment:
 
     ```bash
     python -m venv .venv
@@ -42,13 +51,13 @@ These instructions assume that you have Python ≥ 3.10 and `git` installed.
     # Linux/macOS:
     .venv/bin/activate
     ```
-3. Install the project with its dependencies:
+4. Install the project with its dependencies:
 
    ```bash
    pip install .
    ```
 
-4. To install development dependencies (e.g., for running tests):
+5. To install development dependencies (e.g., for running tests):
 
    ```bash
    pip install .[dev]
