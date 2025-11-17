@@ -8,12 +8,12 @@ pythonpath = ["src"]
 addopts = ["-v"]
 
 [project]
-name = "genetic-algorithms-uni-project"     
+name = "genetic-algorithms-uni-project"
 version = "0.1.0"
 description = "Genetic algorithm experiments."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }              
+license = { text = "MIT" }
 authors = [
   { name = "Inez Małecka", email = "maleckainez@gmail.com" },
 ]
@@ -40,9 +40,10 @@ dependencies = [
 dev = [
   "pytest>=8.0",
   "black>=25.9.0",
-  "monkeypatch>=0.1rc3"
+  "monkeypatch>=0.1rc3",
+  "pre-commit >=4.4.0"
 ]
 
 [tool.setuptools.packages.find]
-where = ["."] 
-include = ["src*"] 
+where = ["."]
+include = ["src*"]

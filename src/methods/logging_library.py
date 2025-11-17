@@ -41,12 +41,17 @@ def initialize(config: ExperimentConfig, paths: PathResolver):
 
 
 def generation(
-    logger: Logger, best_idx: int, best_score: int, weight: int, iteration: int, repetitions:int
+    logger: Logger,
+    best_idx: int,
+    best_score: int,
+    weight: int,
+    iteration: int,
+    repetitions: int,
 ):
     if repetitions > 0:
         repetition_msg = f"      There were {repetitions} individuals with same scores"
     else:
-        repetition_msg = (f" ")
+        repetition_msg = f" "
     logger.info(
         f"Generation {iteration}: \n"
         f"      Index of best individual: {best_idx}\n"

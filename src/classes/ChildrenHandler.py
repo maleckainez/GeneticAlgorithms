@@ -33,4 +33,6 @@ class ChildrenHandler:
             self.children_handle = None
             h.flush()
             del h
-            import gc; gc.collect()
+            import gc
+
+            gc.collect()

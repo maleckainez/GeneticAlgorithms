@@ -3,22 +3,21 @@ from src.classes.PathResolver import PathResolver
 from pathlib import Path
 import csv
 
+
 class OutputGenerator:
 
-    def __init__(self,
-                 pr: PathResolver,
-                 config: ExperimentConfig):
+    def __init__(self, pr: PathResolver, config: ExperimentConfig):
         self.config = config
         self.pr = pr
         self.plot_path = pr.get_plot_path()
         self.input_path = pr.get_output_path()
-        self.filename = Path( self.input_path / f"{pr.filename_constant}.csv")
+        self.filename = Path(self.input_path / f"{pr.filename_constant}.csv")
         self.file = None
         self.writer = None
 
     def _open(self):
         if self.file is None:
-            self.file = open(self.filename, 'w', newline='')
+            self.file = open(self.filename, "w", newline="")
             self.writer = csv.writer(self.file)
 
     def close(self):
@@ -82,7 +81,7 @@ class OutputGenerator:
             "worst_fitness",
             "worst_weight",
             "identical_best_individuals_repetitions",
-            "genome_of_best_individual"
+            "genome_of_best_individual",
         ]
 
         self.writer.writerows(meta_rows)

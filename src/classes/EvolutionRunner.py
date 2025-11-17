@@ -40,7 +40,7 @@ class EvolutionRunner:
 
         self._load_strategies()
 
-    def _load_configuration(self,input_config):
+    def _load_configuration(self, input_config):
 
         # Creates class instance handling config values
         self.config = ExperimentConfig(**input_config)
@@ -84,7 +84,6 @@ class EvolutionRunner:
         self.logger.info(f"Population created successfully as iteration 0")
         self._log_and_save(iteration=0)
 
-
     def _load_strategies(self):
         selection_type = self.config.selection_type
         crossover_type = self.config.crossover_type
@@ -101,14 +100,20 @@ class EvolutionRunner:
 
     def evolve(self):
         try:
-            for iteration in range(1, self.generations+1):
+            for iteration in range(1, self.generations + 1):
                 parent_pool = self.selection_function(
                     fitness_arr=self.fitness, config=self.config
                 )
-                children_manager = ChildrenHandler(config=self.config, paths=self.paths, genome_length=self.population_manager.genome_length)
+                children_manager = ChildrenHandler(
+                    config=self.config,
+                    paths=self.paths,
+                    genome_length=self.population_manager.genome_length,
+                )
                 crossover = Reproduction(parent_pool, self.config, self.paths)
                 method_name = self.crossover_function.__name__
-                getattr(crossover, method_name)(self.population_manager, children_manager)
+                getattr(crossover, method_name)(
+                    self.population_manager, children_manager
+                )
                 self._clean_children(children_manager)
                 self.population_manager.open_pop()
                 self.fitness = calc_fitness_score_batched(
@@ -126,14 +131,23 @@ class EvolutionRunner:
             src.methods.utils.final_screen()
 
     def _analyze_generation(self):
-        sorted_fitness_descending = np.lexsort((self.fitness[:,1], -self.fitness[:,0]))
+        sorted_fitness_descending = np.lexsort(
+            (self.fitness[:, 1], -self.fitness[:, 0])
+        )
         best_idx = sorted_fitness_descending[0]
         best_score, best_weight = self.fitness[best_idx]
-        mask = (self.fitness[:,0] == best_score) & (self.fitness[:,1] == best_weight)
+        mask = (self.fitness[:, 0] == best_score) & (self.fitness[:, 1] == best_weight)
         number_of_identical_best = np.sum(mask) - 1
-        worst_idx = sorted_fitness_descending[len(sorted_fitness_descending)-1]
+        worst_idx = sorted_fitness_descending[len(sorted_fitness_descending) - 1]
         worst_score, worst_weight = self.fitness[worst_idx]
-        return best_idx, best_score, best_weight, worst_score, worst_weight, number_of_identical_best
+        return (
+            best_idx,
+            best_score,
+            best_weight,
+            worst_score,
+            worst_weight,
+            number_of_identical_best,
+        )
 
     def _clean_children(self, children_manager: ChildrenHandler):
         children_manager.close()
@@ -142,26 +156,33 @@ class EvolutionRunner:
         filesize = pop_config["filesize"]
         self.paths.commit_children(expected_size=filesize)
 
-    def _log_and_save(self, iteration:int):
-        best_idx, best_score, best_weight, worst_score, worst_weight, number_of_identical_best = self._analyze_generation()
+    def _log_and_save(self, iteration: int):
+        (
+            best_idx,
+            best_score,
+            best_weight,
+            worst_score,
+            worst_weight,
+            number_of_identical_best,
+        ) = self._analyze_generation()
         log.generation(
             logger=self.logger,
             best_idx=best_idx,
             best_score=best_score,
             weight=best_weight,
             iteration=iteration,
-            repetitions=number_of_identical_best
+            repetitions=number_of_identical_best,
         )
         population = self.population_manager.get_pop_handle()
-        best_item = ''.join(str(char) for char in population[best_idx].tolist())
+        best_item = "".join(str(char) for char in population[best_idx].tolist())
 
         self.csv_logger.write_iteration(
             iteration=iteration,
-            best_fitness= best_score,
-            best_weight= best_weight,
-            avg_fitness= np.mean(self.fitness[:,0]),
+            best_fitness=best_score,
+            best_weight=best_weight,
+            avg_fitness=np.mean(self.fitness[:, 0]),
             worst_fitness=worst_score,
-            worst_weight= worst_weight,
-            identical_best_count= number_of_identical_best,
-            genome= best_item,
+            worst_weight=worst_weight,
+            identical_best_count=number_of_identical_best,
+            genome=best_item,
         )

@@ -1,11 +1,11 @@
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 # ***!!! This branch is main development branch without any stable version yet !!!***
 **It will be merged into main branch when the first stable version appears**
 
 
 # Genetic Algorithms – Knapsack Problem
 
-Implementation of genetic algorithms for classic knapsack benchmark instances (from the `dane AG 2` dataset).  
+Implementation of genetic algorithms for classic knapsack benchmark instances (from the `dane AG 2` dataset).
 The project allows running experiments with different configurations, logging results, and comparing them against known optimal solutions.
 
 ## Requirements
@@ -21,6 +21,7 @@ The project allows running experiments with different configurations, logging re
   - `pytest`
   - `black`
   - `monkeypatch`
+  - `pre-commit`
 
 ## Installation
 
@@ -120,7 +121,7 @@ experiment:
 
 ### Key fields for reproducibility
 
-- **`experiment.seed`** – controls randomness  
+- **`experiment.seed`** – controls randomness
   Same seed ⇒ same random sequence (assuming identical code and library versions).
 - **`data.filename`** – selects which knapsack instance is used.
 - **`population.*`, `selection.*`, `genetic_operators.*`** – must match exactly to reproduce a specific experiment.

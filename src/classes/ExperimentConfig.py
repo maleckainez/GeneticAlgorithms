@@ -21,7 +21,7 @@ class ExperimentConfig:
     selection_pressure: float | None = None
 
     def __post_init__(self):
-        if self.population_size %2 != 0:
+        if self.population_size % 2 != 0:
             raise ValueError("Population has to be even!")
         if self.crossover_probability > 1 or self.crossover_probability < 0:
             raise ValueError("Crossover_probability must be between 0 and 1")
@@ -42,9 +42,11 @@ class ExperimentConfig:
                 object.__setattr__(self, "rng", np.random.default_rng(self.seed))
         if self.selection_type == "rank":
             if self.selection_pressure is None:
-                object.__setattr__(self,"selection_pressure", 1)
+                object.__setattr__(self, "selection_pressure", 1)
             if self.selection_pressure < 1 or self.selection_pressure > 2:
-                raise ValueError("Selection pressure must be float in range from 1 to 2")
+                raise ValueError(
+                    "Selection pressure must be float in range from 1 to 2"
+                )
 
     def generate_probability_of_failure(self, weight_sum: int) -> float:
         if weight_sum < 1:

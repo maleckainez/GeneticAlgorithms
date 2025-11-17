@@ -15,10 +15,16 @@ class PathResolver:
         self.logging_dir: Path | None = None
         self.plot_dir: Path | None = None
 
-        self.small_scale_path = Path(self.PROJECT_ROOT) / "dane AG 2" / "low-dimensional"
-        self.small_scale_optimum = Path(self.PROJECT_ROOT) / "dane AG 2" / "low-dimensional-optimum"
+        self.small_scale_path = (
+            Path(self.PROJECT_ROOT) / "dane AG 2" / "low-dimensional"
+        )
+        self.small_scale_optimum = (
+            Path(self.PROJECT_ROOT) / "dane AG 2" / "low-dimensional-optimum"
+        )
         self.large_scale_path = Path(self.PROJECT_ROOT) / "dane AG 2" / "large_scale"
-        self.large_scale_optimum = Path(self.PROJECT_ROOT) / "dane AG 2" / "large_scale-optimum"
+        self.large_scale_optimum = (
+            Path(self.PROJECT_ROOT) / "dane AG 2" / "large_scale-optimum"
+        )
 
         self.data_path: Path | None = None
 
@@ -73,13 +79,15 @@ class PathResolver:
     def get_children_filepath(self):
         return self.temp_dir / f"child_{self.filename_constant}.dat"
 
-    def commit_children(self, expected_size: int, retries: int=10):
+    def commit_children(self, expected_size: int, retries: int = 10):
         child = self.get_children_filepath()
-        population =Path(self.temp_dir / f"{self.filename_constant}.dat")
+        population = Path(self.temp_dir / f"{self.filename_constant}.dat")
         if not child.exists():
             raise RuntimeError(f"Missing children file {child}")
         if child.stat().st_size != expected_size:
-            raise RuntimeError(f"Children size mismatch: {child.stat().st_size} =/= {expected_size}")
+            raise RuntimeError(
+                f"Children size mismatch: {child.stat().st_size} =/= {expected_size}"
+            )
         last_error = None
         for _ in range(retries):
             try:
@@ -88,7 +96,9 @@ class PathResolver:
             except PermissionError as err:
                 last_error = err
                 time.sleep(0.2)
-        raise RuntimeError(f"Commit failed after {retries} tries.\nDst: {population}\nSrc: {child}\nWith error: {last_error}")
+        raise RuntimeError(
+            f"Commit failed after {retries} tries.\nDst: {population}\nSrc: {child}\nWith error: {last_error}"
+        )
 
     def get_plot_path(self):
         if self.plot_dir is None:

@@ -4,16 +4,15 @@ from pathlib import Path
 import pandas
 from matplotlib import pyplot as plt
 
+
 class Plotter:
 
-    def __init__(self,
-                 pr: PathResolver,
-                 config: ExperimentConfig):
+    def __init__(self, pr: PathResolver, config: ExperimentConfig):
         self.config = config
         self.pr = pr
         self.plot_path = pr.get_plot_path()
         self.input_path = pr.get_output_path()
-        self.filename = Path( self.input_path / f"{pr.filename_constant}.csv")
+        self.filename = Path(self.input_path / f"{pr.filename_constant}.csv")
         self.file = None
         self.writer = None
 
@@ -27,7 +26,6 @@ class Plotter:
         datafile = pandas.read_csv(optimum_filepath, header=None)
         optimum_value = datafile.iloc[0, 0]
         return optimum_value
-
 
     def performance_and_correctness(self):
         optimum_data = self._load_optimum_data()
@@ -45,11 +43,10 @@ class Plotter:
             datafile["iteration"],
             datafile["worst_fitness"],
             label="Fitness of the worst individual",
-            color='mediumpurple',
+            color="mediumpurple",
             linewidth=2,
-            marker='.',
+            marker=".",
             markersize=1,
-
         )
         ax.axhline(
             optimum_data,
@@ -68,7 +65,7 @@ class Plotter:
             linestyle="-",
             marker="s",
             markersize=2,
-            color="C1"
+            color="C1",
         )
         ax.plot(
             datafile["iteration"],
@@ -77,8 +74,7 @@ class Plotter:
             linewidth=2,
             marker="o",
             markersize=3,
-            color="C0"
-
+            color="C0",
         )
 
         ax.set_xlabel("Iteration")
@@ -97,11 +93,13 @@ class Plotter:
             ncol=2,
             frameon=True,
         )
-        ax.margins(0,0.01)
+        ax.margins(0, 0.01)
         fig.tight_layout()
-        plt.subplots_adjust(bottom=0.25, right=0.95, top=0.90, )
+        plt.subplots_adjust(
+            bottom=0.25,
+            right=0.95,
+            top=0.90,
+        )
 
         fig.savefig(Path(self.plot_path) / "best_fitness_v_optimal.png")
         plt.close(fig)
-
-
