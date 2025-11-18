@@ -116,13 +116,15 @@ def load_memmap(
         raise ValueError(f"{config_path} is corrupted")
 
     with open(config_path, "r") as conf_file:
-        config = json.load(conf_file)
-
+        try:
+            config = json.load(conf_file)
+        except json.JSONDecodeError:
+            raise ValueError(f"{config_path} is corrupted")
     dat_path = Path(config["filename"])
     if not dat_path.exists():
         raise FileNotFoundError(f"{dat_path} does not exist")
     if config["filesize"] != dat_path.stat().st_size:
-        raise ValueError("File is corrupted")
+        raise ValueError(f"{dat_path} is corrupted")
     data_file = np.memmap(
         filename=dat_path,
         dtype=config["data_type"],

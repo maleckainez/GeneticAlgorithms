@@ -1,8 +1,13 @@
-from src.methods.utils import load_data, create_memmap_config_json
+from src.methods.utils import (
+    load_data,
+    create_memmap_config_json,
+    load_memmap,
+)
 from pathlib import Path
 import pytest
 import numpy as np
 import json
+import os
 
 
 def test_loading_included_low_dimension_files(root_path):
@@ -166,3 +171,96 @@ def test_create_json_with_non_integer_input(temp_file):
     assert config["population_size"] == 100
     assert config["genome_length"] == 500
     assert config["filesize"] == 500 * 100 * np.dtype(np.uint8).itemsize
+
+
+def test_load_memmap_with_correct_data_and_config(tmp_path):
+    data = [100, 10]
+    filename_constant = "test_tmp_memmap"
+    _test_config_and_mmap_json(tmp_path, data, filename_constant)
+    memmap_file, config = load_memmap(
+        temp=tmp_path, filename_constant="test_tmp_memmap", open_mode="r"
+    )
+    assert memmap_file is not None and config is not None
+    assert memmap_file.shape == (config["population_size"], config["genome_length"])
+    assert (
+        Path(tmp_path / f"{filename_constant}.dat").stat().st_size == config["filesize"]
+    )
+
+
+def test_load_memmap_without_filepath(tmp_path):
+    data = [100, 100]
+    # default filename_constant set for load_memmap is 'population'
+    filename_constant = "population"
+    _test_config_and_mmap_json(tmp_path, data, filename_constant)
+    memmap, config = load_memmap(
+        temp=tmp_path,
+        # filename is set as none
+        filename_constant=None,
+        # open mode is not defined
+    )
+    assert memmap is not None and config is not None
+    assert memmap.shape == (config["population_size"], config["genome_length"])
+    assert (
+        Path(tmp_path / f"{filename_constant}.dat").stat().st_size == config["filesize"]
+    )
+
+
+def test_fail_config_is_missing(tmp_path):
+    with pytest.raises(FileNotFoundError, match="population.json does not exist"):
+        memmap, config = load_memmap(
+            temp=tmp_path,
+            filename_constant=None,
+        )
+
+
+def test_fail_config_is_empty(tmp_path):
+    config = tmp_path / "config.json"
+    config.write_text("")
+    with pytest.raises(ValueError, match="config.json is corrupted"):
+        _, config = load_memmap(temp=tmp_path, filename_constant="config")
+
+
+def test_fail_config_is_full_whitespaces(tmp_path):
+    config = tmp_path / "config.json"
+    config.write_text("\n     \n   \n  ")
+    with pytest.raises(ValueError, match="config.json is corrupted"):
+        _, config = load_memmap(temp=tmp_path, filename_constant="config")
+
+
+def test_fail_config_exist_no_dat_file(tmp_path):
+    _test_config_and_mmap_json(tmp_path, [10, 100], "population")
+    dat_path = tmp_path / "population.dat"
+    os.remove(dat_path)
+    with pytest.raises(FileNotFoundError, match="population.dat does not exist"):
+        _, config = load_memmap(
+            temp=tmp_path,
+        )
+
+
+def test_fail_config_exist_corrupted_dat_file(tmp_path):
+    _test_config_and_mmap_json(tmp_path, [10, 100], "population")
+    dat_path = tmp_path / "population.dat"
+    os.remove(dat_path)
+    dat_path.write_text(" ")
+    with pytest.raises(ValueError, match="population.dat is corrupted"):
+        _, config = load_memmap(
+            temp=tmp_path,
+        )
+
+
+def _test_config_and_mmap_json(path, data, fname_constant):
+    import json
+
+    memmap_path = Path(path / f"{fname_constant}.dat")
+    config_path = Path(path / f"{fname_constant}.json")
+    config = {
+        "filename": str(memmap_path),
+        "data_type": np.dtype(np.uint8).name,
+        "population_size": data[0],
+        "genome_length": data[1],
+        "filesize": data[0] * data[1] * np.dtype(np.uint8).itemsize,
+    }
+    with open(config_path, "w") as file:
+        json.dump(config, file, indent=4)
+
+    np.memmap(filename=memmap_path, shape=tuple(data), mode="w+")
