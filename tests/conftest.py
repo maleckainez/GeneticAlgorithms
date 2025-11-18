@@ -7,6 +7,7 @@ in the 'tests/' directory, including mocked path resolution and data generation 
 from pathlib import Path
 import pytest
 import numpy as np
+from src.classes.PathResolver import PathResolver as PR
 
 
 @pytest.fixture
@@ -25,8 +26,6 @@ def test_only_pathresolver(tmp_path, monkeypatch):
         PathResolver: An initialized PathResolver instance, where PROJECT_ROOT
                       is set to the temporary directory.
     """
-    from src.classes.PathResolver import PathResolver as PR
-
     monkeypatch.setattr(PR, "PROJECT_ROOT", tmp_path)
     path_resolver = PR()
     path_resolver.initialize(filename_constant="pytest_temp_file")
