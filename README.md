@@ -22,6 +22,8 @@ The project allows running experiments with different configurations, logging re
   - `black`
   - `monkeypatch`
   - `pre-commit`
+  - `pylint`
+  - `pylint-pytest` (plugin)
 
 ## Installation
 
