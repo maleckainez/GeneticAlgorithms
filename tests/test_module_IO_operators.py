@@ -1,6 +1,8 @@
-from src.methods.utils import load_data
+from src.methods.utils import load_data, create_memmap_config_json
 from pathlib import Path
 import pytest
+import numpy as np
+import json
 
 
 def test_loading_included_low_dimension_files(root_path):
@@ -90,3 +92,77 @@ def test_loading_correct_file_with_multiple_whitespaces(temp_file):
     expected_result = np.array([[1, 0], [90, 9], [9, 0], [5, 6]])
     data = load_data(temp_file)
     np.testing.assert_array_equal(data, expected_result)
+
+
+def test_create_json_with_correct_input(temp_file):
+
+    create_memmap_config_json(
+        path=temp_file,
+        dat_path=temp_file,
+        datatype=np.uint8,
+        population_size=100,
+        genome_length=500,
+    )
+    assert temp_file.exists()
+    with open(temp_file, "r") as f:
+        config = json.load(f)
+    assert config["filename"] == str(temp_file)
+    assert config["data_type"] == np.dtype(np.uint8).name
+    assert config["population_size"] == 100
+    assert config["genome_length"] == 500
+    assert config["filesize"] == 500 * 100 * np.dtype(np.uint8).itemsize
+
+
+def test_create_json_with_string_dat_path(temp_file):
+    create_memmap_config_json(
+        path=temp_file,
+        dat_path="string_dat_path",
+        datatype=np.uint8,
+        population_size=100,
+        genome_length=500,
+    )
+    assert temp_file.exists()
+    with open(temp_file, "r") as f:
+        config = json.load(f)
+    assert config["filename"] == "string_dat_path"
+    assert config["data_type"] == np.dtype(np.uint8).name
+    assert config["population_size"] == 100
+    assert config["genome_length"] == 500
+    assert config["filesize"] == 500 * 100 * np.dtype(np.uint8).itemsize
+
+
+def test_create_json_with_string_datatype(temp_file):
+
+    create_memmap_config_json(
+        path=temp_file,
+        dat_path="string_dat_path",
+        datatype="uint8",
+        population_size=100,
+        genome_length=500,
+    )
+    assert temp_file.exists()
+    with open(temp_file, "r") as f:
+        config = json.load(f)
+    assert config["filename"] == "string_dat_path"
+    assert config["data_type"] == np.dtype(np.uint8).name
+    assert config["population_size"] == 100
+    assert config["genome_length"] == 500
+    assert config["filesize"] == 500 * 100 * np.dtype(np.uint8).itemsize
+
+
+def test_create_json_with_non_integer_input(temp_file):
+    create_memmap_config_json(
+        path=temp_file,
+        dat_path=temp_file,
+        datatype="uint8",
+        population_size=100.0,
+        genome_length="500",
+    )
+    assert temp_file.exists()
+    with open(temp_file, "r") as f:
+        config = json.load(f)
+    assert config["filename"] == str(temp_file)
+    assert config["data_type"] == np.dtype(np.uint8).name
+    assert config["population_size"] == 100
+    assert config["genome_length"] == 500
+    assert config["filesize"] == 500 * 100 * np.dtype(np.uint8).itemsize

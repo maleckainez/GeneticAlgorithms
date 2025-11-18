@@ -86,6 +86,8 @@ def create_memmap_config_json(
     path: Path, dat_path: Path, datatype: type, population_size: int, genome_length: int
 ) -> None:
     # TODO: docstrings
+    genome_length = int(genome_length)
+    population_size = int(population_size)
     config = {
         "filename": str(dat_path),
         "data_type": np.dtype(datatype).name,
