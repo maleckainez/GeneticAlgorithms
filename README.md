@@ -36,7 +36,7 @@ These instructions assume that you have Python ≥ 3.10 and `git` installed.
 
 2. Checkout to this (development) branch:
     ```bash
-    git checkout origin/feature/genetic-algorithm
+    git checkout feature/genetic-algorithm
     ```
 
 3. Create and activate a virtual environment:
@@ -62,6 +62,7 @@ These instructions assume that you have Python ≥ 3.10 and `git` installed.
 
    ```bash
    pip install .[dev]
+   pip install -e .
    ```
 
 ## Dataset: `dane AG 2`
