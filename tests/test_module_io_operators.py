@@ -1,16 +1,23 @@
+# pylint: disable=missing-function-docstring
+"""Defines tests for i/o functions in src.methods.utils
+
+This module contiains tests for every function modifying
+external files in any way. They should all be located in
+src.methods.utils, but exceptions may occur.
+"""
+from pathlib import Path
+import json
+import os
+import pytest
+import numpy as np
 from src.methods.utils import (
     load_data,
     create_memmap_config_json,
     load_memmap,
 )
-from pathlib import Path
-import pytest
-import numpy as np
-import json
-import os
 
 
-def test_loading_included_low_dimension_files(root_path):
+def test_loading_included_low_dimensional_files(root_path):
     low_dimension_directory = Path(root_path / "dane AG 2" / "low-dimensional")
     file1 = Path(low_dimension_directory / "f6_l-d_kp_10_60")
     file2 = Path(low_dimension_directory / "f7_l-d_kp_7_50")
@@ -89,8 +96,6 @@ def test_loading_not_not_enough_num_in_line(temp_file):
 
 
 def test_loading_correct_file_with_multiple_whitespaces(temp_file):
-    import numpy as np
-
     temp_file.write_text(
         "1 0 \n \n \n \n 90                   9 \n    9   0\n 5    6\n"
     )
@@ -109,7 +114,7 @@ def test_create_json_with_correct_input(temp_file):
         genome_length=500,
     )
     assert temp_file.exists()
-    with open(temp_file, "r") as f:
+    with open(temp_file, "r", encoding="utf-8") as f:
         config = json.load(f)
     assert config["filename"] == str(temp_file)
     assert config["data_type"] == np.dtype(np.uint8).name
@@ -127,7 +132,7 @@ def test_create_json_with_string_dat_path(temp_file):
         genome_length=500,
     )
     assert temp_file.exists()
-    with open(temp_file, "r") as f:
+    with open(temp_file, "r", encoding="utf-8") as f:
         config = json.load(f)
     assert config["filename"] == "string_dat_path"
     assert config["data_type"] == np.dtype(np.uint8).name
@@ -146,7 +151,7 @@ def test_create_json_with_string_datatype(temp_file):
         genome_length=500,
     )
     assert temp_file.exists()
-    with open(temp_file, "r") as f:
+    with open(temp_file, "r", encoding="utf-8") as f:
         config = json.load(f)
     assert config["filename"] == "string_dat_path"
     assert config["data_type"] == np.dtype(np.uint8).name
@@ -164,7 +169,7 @@ def test_create_json_with_non_integer_input(temp_file):
         genome_length="500",
     )
     assert temp_file.exists()
-    with open(temp_file, "r") as f:
+    with open(temp_file, "r", encoding="utf-8") as f:
         config = json.load(f)
     assert config["filename"] == str(temp_file)
     assert config["data_type"] == np.dtype(np.uint8).name
@@ -207,7 +212,7 @@ def test_load_memmap_without_filepath(tmp_path):
 
 def test_fail_config_is_missing(tmp_path):
     with pytest.raises(FileNotFoundError, match="population.json does not exist"):
-        memmap, config = load_memmap(
+        _ = load_memmap(
             temp=tmp_path,
             filename_constant=None,
         )
@@ -217,7 +222,7 @@ def test_fail_config_is_empty(tmp_path):
     config = tmp_path / "config.json"
     config.write_text("")
     with pytest.raises(ValueError, match="config.json is corrupted"):
-        _, config = load_memmap(temp=tmp_path, filename_constant="config")
+        _ = load_memmap(temp=tmp_path, filename_constant="config")
 
 
 def test_fail_config_is_full_whitespaces(tmp_path):
@@ -232,7 +237,7 @@ def test_fail_config_exist_no_dat_file(tmp_path):
     dat_path = tmp_path / "population.dat"
     os.remove(dat_path)
     with pytest.raises(FileNotFoundError, match="population.dat does not exist"):
-        _, config = load_memmap(
+        _ = load_memmap(
             temp=tmp_path,
         )
 
@@ -243,14 +248,12 @@ def test_fail_config_exist_corrupted_dat_file(tmp_path):
     os.remove(dat_path)
     dat_path.write_text(" ")
     with pytest.raises(ValueError, match="population.dat is corrupted"):
-        _, config = load_memmap(
+        _ = load_memmap(
             temp=tmp_path,
         )
 
 
 def _test_config_and_mmap_json(path, data, fname_constant):
-    import json
-
     memmap_path = Path(path / f"{fname_constant}.dat")
     config_path = Path(path / f"{fname_constant}.json")
     config = {
@@ -260,7 +263,7 @@ def _test_config_and_mmap_json(path, data, fname_constant):
         "genome_length": data[1],
         "filesize": data[0] * data[1] * np.dtype(np.uint8).itemsize,
     }
-    with open(config_path, "w") as file:
+    with open(config_path, "w", encoding="utf-8") as file:
         json.dump(config, file, indent=4)
 
     np.memmap(filename=memmap_path, shape=tuple(data), mode="w+")
