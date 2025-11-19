@@ -71,3 +71,16 @@ no_implicit_optional = true
 [project.urls]
 Homepage = "https://github.com/maleckainez/GeneticAlgorithms"
 Source = "https://github.com/maleckainez/GeneticAlgorithms"
+
+
+[tool.coverage.run]
+branch=true
+source=["src"]
+
+[tool.coverage.report]
+show_missing = true
+omit = [
+  "tests/*",
+  "*/__init__.py",
+  "__main__.py"
+]
