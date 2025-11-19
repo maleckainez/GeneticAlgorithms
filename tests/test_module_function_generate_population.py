@@ -6,8 +6,9 @@ located in src.methods.utils used to create starting populations
 for GA algorithms. Tests below ensure that populations are created
 correctly and i/o problems won't occur during memmap creation.
 """
-from pathlib import Path
 import json
+from pathlib import Path
+
 import numpy as np
 from src.methods.utils import create_population_file
 
@@ -93,3 +94,42 @@ def test_create_long_pop(test_only_pathresolver, test_only_rng):
     _validate_population_file(
         pr=test_only_pathresolver, rng=test_only_rng, data=[10000, 100, 500]
     )
+
+
+def test_create_pop_fname_null_uses_default(test_only_pathresolver, test_only_rng):
+    temp_path = test_only_pathresolver.get_temp_path()
+
+    create_population_file(
+        population_size=10,
+        genome_length=10,
+        stream_batch=10,
+        rng=test_only_rng,
+        temp=temp_path,
+        filename_constant=None,
+    )
+
+    mmap_file = temp_path / "population.dat"
+    json_file = temp_path / "population.json"
+
+    assert mmap_file.exists()
+    assert json_file.exists()
+
+
+def test_create_pop_probab_q_null_uses_default(test_only_pathresolver, test_only_rng):
+    temp_path = test_only_pathresolver.get_temp_path()
+
+    create_population_file(
+        population_size=10,
+        genome_length=10,
+        stream_batch=10,
+        rng=test_only_rng,
+        temp=temp_path,
+        filename_constant="population",
+        probability_of_failure=0.03,
+    )
+
+    mmap_file = temp_path / "population.dat"
+    json_file = temp_path / "population.json"
+
+    assert mmap_file.exists()
+    assert json_file.exists()
