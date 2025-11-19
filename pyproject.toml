@@ -29,6 +29,10 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
+[project.urls]
+Homepage = "https://github.com/maleckainez/GeneticAlgorithms"
+Source = "https://github.com/maleckainez/GeneticAlgorithms"
+
 dependencies = [
   "numpy>=1.24",
   "pandas>=2.0",
@@ -40,12 +44,28 @@ dependencies = [
 dev = [
   "pytest>=8.0",
   "black>=25.9.0",
-  "monkeypatch>=0.1rc3",
-  "pre-commit >=4.4.0",
-  "pylint>=4.0.3",
-  "pylint-pytest>=1.1.8"
+  "pre-commit>=4.4.0",
+  "ruff>=0.6",
+  "mypy>=1.18.2",
+  "coverage>=7.12.0",
 ]
 
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["src*"]
+where = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+select = ["E", "F", "I"]
+ignore = []
+src = ["src", "tests"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_configs = true
+disallow_untyped_defs = true
+no_implicit_optional = true

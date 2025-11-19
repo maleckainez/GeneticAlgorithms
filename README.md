@@ -20,10 +20,11 @@ The project allows running experiments with different configurations, logging re
 - Development (optional):
   - `pytest`
   - `black`
-  - `monkeypatch`
   - `pre-commit`
-  - `pylint`
-  - `pylint-pytest` (plugin)
+  - `mypy`
+  - `ruff`
+  - `coverage`
+
 
 ## Installation
 
@@ -60,12 +61,52 @@ These instructions assume that you have Python ≥ 3.10 and `git` installed.
    pip install .
    ```
 
-5. To install development dependencies (e.g., for running tests):
 
-   ```bash
-   pip install .[dev]
-   pip install -e .
-   ```
+## Development
+
+This section describes how to set up a full development environment, run tests, and execute linters and type checkers.
+
+### 1. Setup
+
+Install the project in editable mode together with all development tools:
+
+```
+pip install -e .[dev]
+```
+
+Then install pre-commit hooks:
+
+```
+pre-commit install
+```
+
+### 2. Running tests
+
+From the project root:
+
+```
+pytest
+```
+
+### 3. Running linters and type checks
+
+Code style and static analysis:
+
+```
+ruff check src tests
+black --check src tests
+mypy src
+```
+
+### 4. Test coverage
+
+To measure code coverage:
+
+```
+coverage run -m pytest
+coverage report
+```
+
 
 ## Dataset: `dane AG 2`
 

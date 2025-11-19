@@ -17,3 +17,4 @@ run_output
 *.png
 build/
 *.egg-info/
+.dev_notes/
