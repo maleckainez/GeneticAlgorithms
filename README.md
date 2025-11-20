@@ -48,7 +48,7 @@ These instructions assume that you have Python ≥ 3.10 and `git` installed.
     ```
     ```bash
     # Linux/macOS:
-    .venv/bin/activate
+    . .venv/bin/activate
     ```
 4. Install the project with its dependencies:
 
@@ -66,7 +66,7 @@ This section describes how to set up a full development environment, run tests, 
 Install the project in editable mode together with all development tools:
 
 ```
-pip install -e .[dev]
+pip install -e '.[dev]'
 ```
 
 Then install pre-commit hooks:
