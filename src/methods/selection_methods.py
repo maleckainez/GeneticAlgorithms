@@ -10,10 +10,16 @@ from src.classes.ExperimentConfig import ExperimentConfig
 
 
 def roulette_selection(fitness_arr: np.ndarray, config: ExperimentConfig) -> list[int]:
-    fitness_sum = fitness_arr[:, 0].sum()
+    fitness_array = fitness_arr[:, 0].copy()
+    fitness_sum = fitness_array.sum()
     if fitness_sum == 0:
-        fitness_arr[:, 0] = 1
-        fitness_sum = fitness_arr.shape[0]
+        weights = fitness_arr[:, 1].copy()
+        biggest_weight = weights.max()
+        pseudo_fitness = biggest_weight - weights
+        if np.all(pseudo_fitness == 0):
+            pseudo_fitness[:] = 1
+        fitness_array = pseudo_fitness
+        fitness_sum = pseudo_fitness.sum()
     fitness_proportionate = fitness_arr[:, 0] / fitness_sum
     proportionate_cfd = np.cumsum(fitness_proportionate.flatten())
     proportionate_cfd[-1] = 1
