@@ -5,15 +5,18 @@ This module contiains tests for every function modifying
 external files in any way. They should all be located in
 src.methods.utils, but exceptions may occur.
 """
-from pathlib import Path
 import json
 import os
-import pytest
+from pathlib import Path
+
 import numpy as np
+import pytest
+import yaml
 from src.methods.utils import (
-    load_data,
     create_memmap_config_json,
+    load_data,
     load_memmap,
+    load_yaml_config,
 )
 
 
@@ -267,3 +270,77 @@ def _test_config_and_mmap_json(path, data, fname_constant):
         json.dump(config, file, indent=4)
 
     np.memmap(filename=memmap_path, shape=tuple(data), mode="w+")
+
+
+def test_load_yaml_config_returns_expected_dict(tmp_path):
+    yaml_content = {
+        "data": {
+            "filename": "items.csv",
+            "max_weight": 100,
+        },
+        "population": {
+            "size": 50,
+            "generations": 200,
+            "stream_batch_size": 10,
+        },
+        "selection": {
+            "type": "tournament",
+            "selection_pressure": 0.8,
+        },
+        "genetic_operators": {
+            "crossover_type": "one_point",
+            "crossover_probability": 0.9,
+            "mutation_probability": 0.05,
+            "penalty_multiplier": 2.0,
+        },
+        "experiment": {
+            "seed": 42,
+            "identifier": "test_experiment",
+            "log_level": "INFO",
+        },
+    }
+    config_path = tmp_path / "config.yaml"
+    with open(config_path, "w") as f:
+        yaml.safe_dump(yaml_content, f)
+    result = load_yaml_config(config_path)
+    expected = {
+        "data_filename": "items.csv",
+        "max_weight": 100,
+        "population_size": 50,
+        "generations": 200,
+        "stream_batch_size": 10,
+        "selection_type": "tournament",
+        "selection_pressure": 0.8,
+        "crossover_type": "one_point",
+        "crossover_probability": 0.9,
+        "mutation_probability": 0.05,
+        "penalty": 2.0,
+        "seed": 42,
+        "experiment_identifier": "test_experiment",
+        "log_level": "INFO",
+    }
+
+    assert result == expected
+
+
+def test_load_yaml_config_missing_data_section(tmp_path: Path) -> None:
+    yaml_content = {
+        "data": {
+            "filename": "items.csv",
+            "max_weight": 100,
+        },
+        "population": {
+            "size": 50,
+            "generations": 200,
+            "stream_batch_size": 10,
+        },
+        "selection": {
+            "type": "tournament",
+            "selection_pressure": 0.8,
+        },
+    }
+    config_path = tmp_path / "config.yaml"
+    with open(config_path, "w") as f:
+        yaml.safe_dump(yaml_content, f)
+    with pytest.raises(KeyError):
+        load_yaml_config(config_path)

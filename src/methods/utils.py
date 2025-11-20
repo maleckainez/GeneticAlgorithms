@@ -1,14 +1,10 @@
 # --> IMPORTS <--
-import logging
+import json
 import os.path
 from pathlib import Path
+
 import numpy as np
-import json
-
 import yaml
-
-from src.classes.ExperimentConfig import ExperimentConfig
-from src.classes.PathResolver import PathResolver
 
 
 # --> UTILS <--
@@ -22,7 +18,8 @@ def load_data(path: str | Path) -> np.ndarray:
     :return: dictionary {key: [value, weight]}
     :rtype dict[int, list[int,int]]
     :raises FileNotFoundError: if the file does not exist under the provided path
-    :raises ValueError: if file is empty, contains letters, have missing data, or is wrongly formatted
+    :raises ValueError: if file is empty, contains letters, have missing data,
+        or is wrongly formatted
     """
     if not os.path.exists(path):
         raise FileNotFoundError(f"File not found {path}")
@@ -134,7 +131,7 @@ def load_memmap(
     return data_file, config
 
 
-def final_screen():
+def final_screen():  # pragma: no cover
     print(
         r"""
            ______      __           __      __  _
