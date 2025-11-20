@@ -1,3 +1,9 @@
+"""Contains methods for parent pool selection in one place.
+
+This module brings together methods in which user can select
+appropriate parent pool based on individuals fitness score.
+"""
+
 import numpy as np
 
 from src.classes.ExperimentConfig import ExperimentConfig
@@ -39,21 +45,17 @@ def _tournament_tie_breaker(gladiators: list[int], fitness_arr: np.ndarray):
     raise NotImplementedError()
 
 
-def linear_rank_selection(fitness_arr: np.ndarray, config: ExperimentConfig):
+def linear_rank_selection(
+    fitness_arr: np.ndarray, config: ExperimentConfig
+) -> list[int]:
     rng = config.rng
     SP = config.selection_pressure
     sorted_idx = np.lexsort((-fitness_arr[:, 1], fitness_arr[:, 0]))
     ranks = np.zeros(shape=fitness_arr.shape[0], dtype=np.int64)
     n = len(fitness_arr)
     ranks[sorted_idx] = np.arange(1, n + 1)
-    # Consider Nind the number of individuals in the population, Pos the position of an individual in this population
-    # (least fit individual has Pos=1, the fittest individual Pos=Nind) and SP the selective pressure.
-    # The fitness value for an individual is calculated as:
-    # Fitess(pos) = 2 - SP + 2*(SP-1)*((pos-1)/Nind-1)
-
     fitness_rank = 2 - SP + 2 * (SP - 1) * (ranks - 1) / (n - 1)
     probability_distribution = fitness_rank / n
-    # distribution safeguard
     probability_distribution = probability_distribution / probability_distribution.sum()
     parent_arr = rng.choice(
         np.arange(n),
@@ -61,14 +63,4 @@ def linear_rank_selection(fitness_arr: np.ndarray, config: ExperimentConfig):
         replace=True,
         p=probability_distribution,
     )
-    if parent_arr.size % 2 != 0:
-        parent_arr = np.append(
-            parent_arr,
-            rng.choice(
-                np.arange(n),
-                config.population_size,
-                replace=True,
-                p=probability_distribution,
-            ),
-        )
     return parent_arr
