@@ -1,15 +1,14 @@
 import os
 import shutil
-from pathlib import Path
-from shutil import rmtree
 import time
+from pathlib import Path
 
 
 class PathResolver:
     PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
     def __init__(self):
-        self.filename_constant: str | None = None
+        self.filename_constant: str = "undefined_experiment"
         self.temp_dir: Path | None = None
         self.output_dir: Path | None = None
         self.logging_dir: Path | None = None
@@ -97,7 +96,10 @@ class PathResolver:
                 last_error = err
                 time.sleep(0.2)
         raise RuntimeError(
-            f"Commit failed after {retries} tries.\nDst: {population}\nSrc: {child}\nWith error: {last_error}"
+            f"Commit failed after {retries} tries.\n"
+            f"Dst: {population}\n"
+            f"Src: {child}\n"
+            f"With error: {last_error}"
         )
 
     def get_plot_path(self):
