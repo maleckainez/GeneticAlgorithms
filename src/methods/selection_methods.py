@@ -20,7 +20,7 @@ def roulette_selection(fitness_arr: np.ndarray, config: ExperimentConfig) -> lis
             pseudo_fitness[:] = 1
         fitness_array = pseudo_fitness
         fitness_sum = pseudo_fitness.sum()
-    fitness_proportionate = fitness_arr[:, 0] / fitness_sum
+    fitness_proportionate = fitness_array / fitness_sum
     proportionate_cfd = np.cumsum(fitness_proportionate.flatten())
     proportionate_cfd[-1] = 1
     r = config.rng.random(config.population_size)
