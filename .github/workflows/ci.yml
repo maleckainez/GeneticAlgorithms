@@ -28,6 +28,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install .[dev]
 
+      - name: Set up working directory
+        run: cd ${{ github.workspace }}
+
       - name: Black (check only)
         run: black --check .
 
