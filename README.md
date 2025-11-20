@@ -1,9 +1,7 @@
+![GitHub Tag](https://img.shields.io/github/v/tag/maleckainez/GeneticAlgorithms?include_prereleases)
+
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-
-# ***!!! This branch is main development branch without any stable version yet !!!***
-**It will be merged into main branch when the first stable version appears**
-
 
 # Genetic Algorithms – Knapsack Problem
 
@@ -38,11 +36,6 @@ These instructions assume that you have Python ≥ 3.10 and `git` installed.
    git clone https://github.com/maleckainez/GeneticAlgorithms.git
    cd GeneticAlgorithms
    ```
-
-2. Checkout to this (development) branch:
-    ```bash
-    git checkout feature/genetic-algorithm
-    ```
 
 3. Create and activate a virtual environment:
 
