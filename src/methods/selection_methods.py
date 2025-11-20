@@ -33,7 +33,6 @@ def tournament_selection(
 ) -> list[int]:
     tournament_size = 5
     rng = config.rng
-    fitness_score_arr = fitness_arr[:, 0]
     selected_parents = []
     # takes up chunk of population, checks best idx of fitness
     for i in range(config.population_size):
@@ -42,13 +41,13 @@ def tournament_selection(
             size=tournament_size,
             replace=False,
         )
-        winner = int(np.argmax(fitness_score_arr[gladiators]))
-        selected_parents.append(int(gladiators[winner]))
+        sub = fitness_arr[gladiators]
+        order_local = np.lexsort((sub[:, 1], -sub[:, 0]))
+        winner_local = order_local[0]
+        winner_global = int(gladiators[winner_local])
+
+        selected_parents.append(winner_global)
     return selected_parents
-
-
-def _tournament_tie_breaker(gladiators: list[int], fitness_arr: np.ndarray):
-    raise NotImplementedError()
 
 
 def linear_rank_selection(
