@@ -10,8 +10,7 @@ from src.classes.ExperimentConfig import ExperimentConfig
 
 
 def roulette_selection(fitness_arr: np.ndarray, config: ExperimentConfig) -> list[int]:
-    """
-    Select parents using roulette-wheel (fitness-proportionate) selection.
+    """Select parents using roulette-wheel (fitness-proportionate) selection.
 
     The first column of ``fitness_arr`` is treated as a fitness value. If the
     sum of fitness values is zero, a pseudo-fitness is derived from the second
@@ -52,8 +51,7 @@ def tournament_selection(
     fitness_arr: np.ndarray,
     config: ExperimentConfig,
 ) -> list[int]:
-    """
-    Select parents using tournament selection.
+    """Select parents using tournament selection.
 
     For each parent to be selected, a fixed-size tournament (subset of
     individuals) is sampled without replacement from the population. The winner
@@ -94,8 +92,7 @@ def tournament_selection(
 def linear_rank_selection(
     fitness_arr: np.ndarray, config: ExperimentConfig
 ) -> list[int]:
-    """
-    Select parents using linear rank-based selection.
+    """Select parents using linear rank-based selection.
 
     Individuals are sorted and assigned ranks; selection probabilities are then
     computed from these ranks using the linear ranking scheme controlled by
