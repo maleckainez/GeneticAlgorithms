@@ -58,7 +58,7 @@ def initialize(config: ExperimentConfig, paths: PathResolver) -> LoggerAdapter[L
 
 
 def log_generation(
-    logger: LoggerAdapter[Logger],
+    logger: Logger,
     best_idx: int,
     best_score: int,
     weight: int,
