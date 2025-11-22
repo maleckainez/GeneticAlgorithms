@@ -3,7 +3,7 @@
 # ruff: noqa
 
 
-def final_screen():  # pragma: no cover
+def final_screen() -> None:  # pragma: no cover
     print(
         r"""
            ______      __           __      __  _
