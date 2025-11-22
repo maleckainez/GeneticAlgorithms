@@ -1,14 +1,14 @@
 """Configure logging and provide helper functions for experiment runtime logs."""
 
 import logging
-from logging import Logger
+from logging import Logger, LoggerAdapter
 from pathlib import Path
 
 from src.classes.ExperimentConfig import ExperimentConfig
 from src.classes.PathResolver import PathResolver
 
 
-def initialize(config: ExperimentConfig, paths: PathResolver):
+def initialize(config: ExperimentConfig, paths: PathResolver) -> LoggerAdapter[Logger]:
     """Initialize experiment logger and wrap it in a LoggerAdapter.
 
     Sets up console and file handlers, applies a unified formatter and attaches
@@ -58,13 +58,13 @@ def initialize(config: ExperimentConfig, paths: PathResolver):
 
 
 def log_generation(
-    logger: Logger,
+    logger: LoggerAdapter[Logger],
     best_idx: int,
     best_score: int,
     weight: int,
     iteration: int,
     repetitions: int,
-):
+) -> None:
     """Log summary information for a single generation.
 
     Args:
