@@ -8,7 +8,7 @@ from src.classes.ExperimentConfig import ExperimentConfig
 from src.classes.PathResolver import PathResolver
 
 
-def initialize(config: ExperimentConfig, paths: PathResolver) -> LoggerAdapter[Logger]:
+def initialize(config: ExperimentConfig, paths: PathResolver) -> LoggerAdapter:
     """Initialize experiment logger and wrap it in a LoggerAdapter.
 
     Sets up console and file handlers, applies a unified formatter and attaches
