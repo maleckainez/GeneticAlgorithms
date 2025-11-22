@@ -29,7 +29,9 @@ def roulette_selection(fitness_arr: np.ndarray, config: ExperimentConfig) -> lis
         list[int]: Indices of selected parents (with replacement), of length
             ``config.population_size``.
     """
-    if config.rng is None:
+    # Defensive guard: ExperimentConfig.__post_init__ guarantees rng is not None.
+    # Marked as no cover because this branch should be unreachable in normal usage.
+    if config.rng is None:  # pragma: no cover
         raise ValueError("Experiment config was not defined!")
     fitness_array = fitness_arr[:, 0].copy()
     fitness_sum = fitness_array.sum()
@@ -71,7 +73,9 @@ def tournament_selection(
         list[int]: Indices of selected parents (with replacement), of length
             ``config.population_size``.
     """
-    if config.rng is None:
+    # Defensive guard: ExperimentConfig.__post_init__ guarantees rng is not None.
+    # Marked as no cover because this branch should be unreachable in normal usage.
+    if config.rng is None:  # pragma: no cover
         raise ValueError("Experiment config was not defined!")
     tournament_size = 5
     rng = config.rng
@@ -118,7 +122,9 @@ def linear_rank_selection(
         list[int]: Indices of selected parents (with replacement), of length
             ``config.population_size``.
     """
-    if config.rng is None or config.selection_pressure is None:
+    # Defensive guard: ExperimentConfig.__post_init__ guarantees rng is not None.
+    # Marked as no cover because this branch should be unreachable in normal usage.
+    if config.rng is None or config.selection_pressure is None:  # pragma: no cover
         raise ValueError("Experiment config was not defined!")
     rng = config.rng
     SP = config.selection_pressure
