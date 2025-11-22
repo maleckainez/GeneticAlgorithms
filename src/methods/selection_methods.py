@@ -135,4 +135,4 @@ def linear_rank_selection(
         replace=True,
         p=probability_distribution,
     )
-    return parent_arr
+    return parent_arr.tolist()
