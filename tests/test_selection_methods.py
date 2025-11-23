@@ -9,6 +9,7 @@ favoritising more fit individuals.
 from collections.abc import Callable
 
 import numpy as np
+import pytest
 from src.classes.ExperimentConfig import ExperimentConfig
 from src.methods.selection_methods import (
     linear_rank_selection,
@@ -167,3 +168,20 @@ def test_linear_rank_happy_path(
     parents = linear_rank_selection(CORRECT_ARRAY, config)
     assert len(parents) == config.population_size
     assert all(0 <= p < config.population_size for p in parents)
+
+
+def test_tournament_selection_fails_when_population_smaller_than_tournament(
+    experiment_config_factory: Callable[..., ExperimentConfig],
+) -> None:
+    config = experiment_config_factory(
+        population_size=4,
+        generations=5,
+        max_weight=100,
+        selection_type="roulette",
+        crossover_type="one",
+        crossover_probability=0.8,
+        mutation_probability=0.05,
+        penalty_multiplier=10.0,
+    )
+    with pytest.raises(ValueError):
+        tournament_selection(ARRAY_WITH_NULL_FITNESS[:4], config)
