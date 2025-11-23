@@ -33,4 +33,5 @@ def test_children_handler_creates_memmap_and_closes(
     assert child_path.stat().st_size == expected_size
 
     handler.close()
+    handler.close()
     assert handler.children_handle is None

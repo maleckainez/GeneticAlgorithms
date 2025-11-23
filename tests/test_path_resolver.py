@@ -22,6 +22,8 @@ def test_get_dict_filepath_small_scale(test_only_pathresolver: PathResolver) -> 
     assert log_path is not None
     test_only_pathresolver.cleanup_temp_dir()
     assert os.path.exists(dict_path) is False
+    test_only_pathresolver.cleanup_temp_dir()
+    assert os.path.exists(dict_path) is False
 
 
 def test_get_dict_filepath_large_scale(test_only_pathresolver: PathResolver) -> None:

@@ -59,7 +59,6 @@ def test_output_generator_writes_meta_and_rows(
         genome="1010",
     )
     generator.close()
-
     with open(generator.filename, newline="") as f:
         rows = list(csv.reader(f))
 
@@ -74,3 +73,34 @@ def test_output_generator_writes_meta_and_rows(
         "0",
         "1010",
     ]
+
+
+def test_output_generator_opens_and_closes_correctly(
+    experiment_config_factory, test_only_pathresolver
+) -> None:
+    config = experiment_config_factory(
+        population_size=4,
+        generations=2,
+        max_weight=10,
+        selection_type="roulette",
+        crossover_type="one",
+        crossover_probability=0.5,
+        mutation_probability=0.1,
+        penalty_multiplier=1.0,
+    )
+    generator = OutputGenerator(test_only_pathresolver, config)
+    generator._open()
+    generator._open()
+    generator.init_csv(config)
+    generator.write_iteration(
+        iteration=1,
+        best_fitness=10,
+        best_weight=5,
+        avg_fitness=6.5,
+        worst_fitness=2,
+        worst_weight=3,
+        identical_best_count=0,
+        genome="1010",
+    )
+    generator.close()
+    generator.close()
