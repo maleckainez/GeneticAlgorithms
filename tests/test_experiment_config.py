@@ -79,6 +79,37 @@ def test_selection_pressure_range_for_rank_selection() -> None:
         ExperimentConfig(**kwargs)
 
 
+def test_rank_selection_sets_rng_and_default_pressure() -> None:
+    cfg = ExperimentConfig(
+        data_filename="items.csv",
+        population_size=10,
+        generations=2,
+        max_weight=50,
+        seed=None,
+        selection_type="rank",
+        crossover_type="one",
+        crossover_probability=0.5,
+        mutation_probability=0.1,
+        penalty=1.0,
+        experiment_identifier=1,
+        log_level="INFO",
+        stream_batch_size=5,
+        selection_pressure=None,
+        rng=None,
+    )
+    assert cfg.rng is not None
+    assert cfg.selection_pressure == 1
+
+
+def test_generate_probability_of_failure_validates_and_clamps() -> None:
+    cfg = ExperimentConfig(**_base_kwargs())
+    with pytest.raises(ValueError, match="Weight sum must be greater than 0"):
+        cfg.generate_probability_of_failure(0)
+
+    prob = cfg.generate_probability_of_failure(weight_sum=1)
+    assert prob == 1.0
+
+
 def test_none_rng_and_seed_none() -> None:
     kwargs = _base_kwargs()
     kwargs["seed"] = None
