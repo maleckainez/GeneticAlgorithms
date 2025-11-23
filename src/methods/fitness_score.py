@@ -72,7 +72,9 @@ def fitness_class_adapter(
 
     population = pop_manager.get_pop_handle()
     batch = config.stream_batch_size
-    if batch is None:
+    # Defensive guard: ExperimentConfig.__post_init__ guarantees batch is not None.
+    # Marked as no cover because this branch should be unreachable in normal usage.
+    if batch is None:  # pragma: no cover
         batch = 500
     value = value_weight_arr[:, 0]
     weight = value_weight_arr[:, 1]
