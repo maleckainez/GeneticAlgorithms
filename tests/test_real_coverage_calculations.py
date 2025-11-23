@@ -1,4 +1,4 @@
-# tests/test_imports_smoke.py
+"""Temporary imports for coverage calculations."""
 
 
 def test_all_core_modules_import():

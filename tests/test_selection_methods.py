@@ -1,4 +1,4 @@
-"""Defines tests for parent selection methods
+"""Defines tests for parent selection methods.
 
 This module contiains tests for GA specific selection
 methods located in 'src.modules.selection_methods'.

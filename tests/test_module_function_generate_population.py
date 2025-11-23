@@ -1,5 +1,5 @@
 # pylint: disable=missing-function-docstring
-"""Defines tests for create_population_file function
+"""Defines tests for create_population_file function.
 
 This module contiains test specific only for testing function
 located in src.methods.utils used to create starting populations
@@ -25,6 +25,7 @@ def _validate_population_file(pr, rng, data):
             state with a predefined seed.
         data (list[int]): List containing integer values in the form
             [population_size, genome_length, stream_batch].
+
     """
     # define variables
     temp_path = pr.get_temp_path()

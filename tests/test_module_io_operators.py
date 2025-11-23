@@ -1,5 +1,5 @@
 # pylint: disable=missing-function-docstring
-"""Defines tests for i/o functions in src.methods.utils
+"""Defines tests for i/o functions in src.methods.utils.
 
 This module contiains tests for every function modifying
 external files in any way. They should all be located in
