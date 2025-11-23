@@ -1,9 +1,9 @@
 # pylint: disable=missing-function-docstring
-"""Defines tests for i/o functions in src.methods.utils.
+"""Defines tests for i/o functions.
 
 This module contiains tests for every function modifying
 external files in any way. They should all be located in
-src.methods.utils, but exceptions may occur.
+``src.methods.data_loader`` and ``src.methods.memmap_operations``.
 """
 import json
 import os
@@ -12,12 +12,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 import yaml
-from src.methods.utils import (
-    create_memmap_config_json,
-    load_data,
-    load_memmap,
-    load_yaml_config,
-)
+from src.methods.data_loader import load_data, load_yaml_config
+from src.methods.memmap_operations import create_memmap_config_json, load_memmap
 
 
 def test_loading_included_low_dimensional_files(root_path):
