@@ -1,9 +1,4 @@
-"""Module for creation and management of memory-mapped population file.
-
-It provides the ChildrenHandler class, which is responsible for creating,
-accessing, and safely closing the NumPy memmap file used to temporarily store
-the population during the reproduction cycle.
-"""
+"""Module for creation and management of memory-mapped children file."""
 
 from typing import Optional
 
@@ -13,7 +8,7 @@ from src.classes.PathResolver import PathResolver
 
 
 class ChildrenHandler:
-    """Handles the creation, management, and safe closure of the population memmap."""
+    """Handles the creation, management, and safe closure of the children memmap."""
 
     def __init__(
         self,
@@ -21,7 +16,7 @@ class ChildrenHandler:
         paths: PathResolver,
         genome_length: int,
     ) -> None:
-        """Creates memmap and generates random starting population.
+        """Creates children memmap.
 
         Args:
             config (ExperimentConfig): Configuration object containing
