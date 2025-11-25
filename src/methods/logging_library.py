@@ -1,7 +1,7 @@
 """Configure logging and provide helper functions for experiment runtime logs."""
 
 import logging
-from logging import Logger, LoggerAdapter
+from logging import LoggerAdapter
 from pathlib import Path
 
 from src.classes.ExperimentConfig import ExperimentConfig
@@ -58,7 +58,7 @@ def initialize(config: ExperimentConfig, paths: PathResolver) -> LoggerAdapter:
 
 
 def log_generation(
-    logger: Logger,
+    logger: LoggerAdapter,
     best_idx: int,
     best_score: int,
     weight: int,
