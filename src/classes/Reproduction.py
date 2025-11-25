@@ -23,7 +23,7 @@ class Reproduction:
 
     def __init__(
         self,
-        parent_pool: np.ndarray,
+        parent_pool: list[int],
         config: ExperimentConfig,
         paths: PathResolver,
     ) -> None:

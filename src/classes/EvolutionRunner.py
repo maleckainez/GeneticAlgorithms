@@ -1,22 +1,25 @@
-import numpy as np
+"""Drive the genetic algorithm evolution process."""
 
+from typing import Any
+
+import numpy as np
+import src.methods.logging_library as log
 import src.methods.utils
+from src.classes.ChildrenHandler import ChildrenHandler
 from src.classes.ExperimentConfig import ExperimentConfig
+from src.classes.OutputGenerator import OutputGenerator
 from src.classes.PathResolver import PathResolver
 from src.classes.Plotter import Plotter
 from src.classes.PopulationHandler import PopulationHandler as PopHandler
 from src.classes.Reproduction import Reproduction
 from src.methods.experiment_defining_tools import create_unique_experiment_name
 from src.methods.fitness_score import calc_fitness_score_batched
-from src.methods.utils import load_data
-import src.methods.logging_library as log
 from src.methods.selection_methods import (
+    linear_rank_selection,
     roulette_selection,
     tournament_selection,
-    linear_rank_selection,
 )
-from src.classes.ChildrenHandler import ChildrenHandler
-from src.classes.OutputGenerator import OutputGenerator
+from src.methods.utils import load_data
 
 SELECTION_METHODS = {
     "roulette": roulette_selection,
@@ -30,8 +33,10 @@ CROSSOVER_METHODS = {
 
 
 class EvolutionRunner:
-    def __init__(self, input_config):
+    """Coordinates selection, crossover, mutation, and logging."""
 
+    def __init__(self, input_config: dict) -> None:
+        """Initialize runner with config and prepare environment."""
         self._load_configuration(input_config)
 
         self._prepare_environment()
@@ -40,8 +45,12 @@ class EvolutionRunner:
 
         self._load_strategies()
 
-    def _load_configuration(self, input_config):
+    def _load_configuration(self, input_config: dict) -> None:
+        """Load configuration, paths, and item value/weight data.
 
+        Args:
+            input_config (dict): Raw configuration values from the user.
+        """
         # Creates class instance handling config values
         self.config = ExperimentConfig(**input_config)
 
@@ -55,7 +64,8 @@ class EvolutionRunner:
 
         self.generations = self.config.generations
 
-    def _prepare_environment(self):
+    def _prepare_environment(self) -> None:
+        """Create identifiers, logging, and output helpers."""
         filename_constant = create_unique_experiment_name(
             config=self.config,
             genome_length=self.value_weight_array.shape[0],
@@ -68,7 +78,8 @@ class EvolutionRunner:
         self.csv_logger = OutputGenerator(self.paths, self.config)
         self.csv_logger.init_csv(self.config)
 
-    def _initialize_first_generation(self):
+    def _initialize_first_generation(self) -> None:
+        """Create initial population and log generation zero."""
         self.population_manager = PopHandler(
             config=self.config,
             paths=self.paths,
@@ -81,10 +92,11 @@ class EvolutionRunner:
             config=self.config,
             pop_manager=self.population_manager,
         )
-        self.logger.info(f"Population created successfully as iteration 0")
+        self.logger.info("Population created successfully as iteration 0")
         self._log_and_save(iteration=0)
 
-    def _load_strategies(self):
+    def _load_strategies(self) -> None:
+        """Select selection and crossover methods based on config."""
         selection_type = self.config.selection_type
         crossover_type = self.config.crossover_type
         if selection_type not in SELECTION_METHODS:
@@ -98,7 +110,8 @@ class EvolutionRunner:
         self.crossover_function = CROSSOVER_METHODS[crossover_type]
         self.logger.info(f"{crossover_type} crossover method was chosen.")
 
-    def evolve(self):
+    def evolve(self) -> None:
+        """Run all generations: selection, crossover, evaluation, and logging."""
         try:
             for iteration in range(1, self.generations + 1):
                 parent_pool = self.selection_function(
@@ -130,7 +143,12 @@ class EvolutionRunner:
             plotter.performance_and_correctness()
             src.methods.utils.final_screen()
 
-    def _analyze_generation(self):
+    def _analyze_generation(self) -> tuple[Any, Any, Any, Any, Any, Any]:
+        """Compute best/worst individuals and repetition counts.
+
+        Returns:
+            tuple: Stats for best and worst fitness and their counts.
+        """
         sorted_fitness_descending = np.lexsort(
             (self.fitness[:, 1], -self.fitness[:, 0])
         )
@@ -149,14 +167,16 @@ class EvolutionRunner:
             number_of_identical_best,
         )
 
-    def _clean_children(self, children_manager: ChildrenHandler):
+    def _clean_children(self, children_manager: ChildrenHandler) -> None:
+        """Close child memmap, swap it into population, and commit."""
         children_manager.close()
         self.population_manager.close()
         pop_config = self.population_manager.get_pop_config()
         filesize = pop_config["filesize"]
         self.paths.commit_children(expected_size=filesize)
 
-    def _log_and_save(self, iteration: int):
+    def _log_and_save(self, iteration: int) -> None:
+        """Log current generation stats and write CSV output."""
         (
             best_idx,
             best_score,
@@ -174,6 +194,7 @@ class EvolutionRunner:
             repetitions=number_of_identical_best,
         )
         population = self.population_manager.get_pop_handle()
+        assert population is not None
         best_item = "".join(str(char) for char in population[best_idx].tolist())
 
         self.csv_logger.write_iteration(
