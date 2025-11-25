@@ -38,15 +38,8 @@ jobs:
         run: |
           coverage run -m pytest
           mkdir -p .github
-          coverage xml -o .github/coverage.xml
           coverage json -o .github/coverage.json
           python .github/json_analyzer.py
-
-      - name: Get Coverage Comment 
-        uses: orgoro/coverage@v3.2
-        with:
-          coverageFile: .github/coverage.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit coverage json
         run: |
