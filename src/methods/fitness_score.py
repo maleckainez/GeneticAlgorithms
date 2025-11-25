@@ -78,6 +78,7 @@ def fitness_class_adapter(
         batch = 500
     value = value_weight_arr[:, 0]
     weight = value_weight_arr[:, 1]
+    assert population is not None
     return fitness_calculation(
         max_weight=max_weight,
         penalty_factor=penalty_factor,
