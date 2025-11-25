@@ -1,49 +1,102 @@
-"""Tests for parent pairing and mutation helpers in Reproduction."""
+"""Defines tests for reproduction class."""
 
 import numpy as np
+from src.classes.ChildrenHandler import ChildrenHandler
 from src.classes.Reproduction import Reproduction
 
 
-def test_pair_parents_covers_all_indices(
-    experiment_config_factory, test_only_pathresolver
-) -> None:
-    parent_pool = np.arange(6)
-    config = experiment_config_factory(
-        population_size=6,
-        generations=2,
-        max_weight=10,
-        selection_type="roulette",
-        crossover_type="one",
-        crossover_probability=0.5,
-        mutation_probability=0.0,
-        penalty_multiplier=1.0,
+def _create_pop_handler(dummy_pop_manager, temp_file):
+    population = np.memmap(
+        filename=f"{temp_file}.dat", dtype=np.uint8, mode="w+", shape=(10, 5)
     )
-    repro = Reproduction(parent_pool, config, test_only_pathresolver)
-    flattened = repro.parent_pairs.flatten()
-    assert sorted(flattened.tolist()) == sorted(parent_pool.tolist())
-    assert repro.parent_pairs.shape == (3, 2)
+    population[:] = [
+        [0, 0, 0, 1, 1],
+        [0, 1, 0, 1, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 1, 1],
+        [1, 0, 0, 1, 1],
+        [0, 0, 0, 1, 1],
+        [0, 0, 1, 1, 1],
+        [1, 0, 0, 0, 1],
+        [0, 1, 0, 1, 0],
+    ]
+    return dummy_pop_manager(population)
 
 
-def test_mutation_flips_bits_when_probability_one(
-    experiment_config_factory, test_only_pathresolver
-) -> None:
-    parent_pool = np.arange(4)
+def test_reproduction_single_crossover_no_mutation(
+    experiment_config_factory, test_only_pathresolver, dummy_pop_manager, temp_file
+):
     config = experiment_config_factory(
-        population_size=4,
+        population_size=10,
         generations=1,
-        max_weight=10,
+        max_weight=100,
         selection_type="roulette",
         crossover_type="one",
-        crossover_probability=0.5,
-        mutation_probability=1.0,
-        penalty_multiplier=1.0,
+        crossover_probability=0.9,
+        mutation_probability=0,
+        penalty_multiplier=0,
     )
-    repro = Reproduction(parent_pool, config, test_only_pathresolver)
-    repro.mutation_probability = 1.0
-    c1 = np.array([[0, 1], [1, 0]], dtype=np.uint8)
-    c2 = np.array([[1, 1], [0, 0]], dtype=np.uint8)
+    parent_pool = np.array([1, 5, 6, 9, 2, 0, 0, 7, 6, 6], dtype=np.uint8)
+    pop_manager = _create_pop_handler(dummy_pop_manager, temp_file)
+    reproduction = Reproduction(
+        parent_pool=parent_pool, config=config, paths=test_only_pathresolver
+    )
+    handler = ChildrenHandler(
+        config=config,
+        paths=test_only_pathresolver,
+        genome_length=5,
+    )
+    reproduction.single_crossover(pop_manager, handler)
 
-    mutated_c1, mutated_c2 = repro._mutation(c1.copy(), c2.copy())
 
-    np.testing.assert_array_equal(mutated_c1, 1 - c1)
-    np.testing.assert_array_equal(mutated_c2, 1 - c2)
+def test_reproduction_double_crossover_no_mutation(
+    experiment_config_factory, test_only_pathresolver, dummy_pop_manager, temp_file
+):
+    config = experiment_config_factory(
+        population_size=10,
+        generations=1,
+        max_weight=100,
+        selection_type="roulette",
+        crossover_type="one",
+        crossover_probability=0.9,
+        mutation_probability=0,
+        penalty_multiplier=0,
+    )
+    parent_pool = np.array([1, 5, 6, 9, 2, 0, 0, 7, 6, 6], dtype=np.uint8)
+    pop_manager = _create_pop_handler(dummy_pop_manager, temp_file)
+    reproduction = Reproduction(
+        parent_pool=parent_pool, config=config, paths=test_only_pathresolver
+    )
+    handler = ChildrenHandler(
+        config=config,
+        paths=test_only_pathresolver,
+        genome_length=5,
+    )
+    reproduction.double_crossover(pop_manager, handler)
+
+
+def test_reproduction_single_crossover_with_mutation(
+    experiment_config_factory, test_only_pathresolver, dummy_pop_manager, temp_file
+):
+    config = experiment_config_factory(
+        population_size=10,
+        generations=1,
+        max_weight=100,
+        selection_type="roulette",
+        crossover_type="one",
+        crossover_probability=0.9,
+        mutation_probability=0.1,
+        penalty_multiplier=0,
+    )
+    parent_pool = np.array([1, 5, 6, 9, 2, 0, 0, 7, 6, 6], dtype=np.uint8)
+    pop_manager = _create_pop_handler(dummy_pop_manager, temp_file)
+    reproduction = Reproduction(
+        parent_pool=parent_pool, config=config, paths=test_only_pathresolver
+    )
+    handler = ChildrenHandler(
+        config=config,
+        paths=test_only_pathresolver,
+        genome_length=5,
+    )
+    reproduction.single_crossover(pop_manager, handler)
