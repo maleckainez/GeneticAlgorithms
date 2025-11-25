@@ -41,7 +41,8 @@ jobs:
 
       - name: MyPy check
         run: |
-          mypy --install-types
+          python3 -m pip install types-PyYAML
+          python3 -m pip install pandas-stubs
           mypy src
 
       - name: Pytest
