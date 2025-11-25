@@ -1,7 +1,10 @@
 ![GitHub Tag](https://img.shields.io/github/v/tag/maleckainez/GeneticAlgorithms?include_prereleases)
 
+[![Build Status](https://github.com/maleckainez/GeneticAlgorithms/actions/workflows/ci.yml/badge.svg)](https://github.com/maleckainez/GeneticAlgorithms/actions/workflows/ci.yml)
+[![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 
 # Genetic Algorithms – Knapsack Problem
 
