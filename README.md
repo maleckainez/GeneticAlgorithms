@@ -1,8 +1,11 @@
 ![GitHub Tag](https://img.shields.io/github/v/tag/maleckainez/GeneticAlgorithms?include_prereleases)
 
+[![Build Status](https://github.com/maleckainez/GeneticAlgorithms/actions/workflows/ci.yml/badge.svg)](https://github.com/maleckainez/GeneticAlgorithms/actions/workflows/ci.yml)
 ![Endpoint Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmaleckainez%2FGeneticAlgorithms%2Frefs%2Fheads%2Fcoverage_score%2F.github%2Fcoverage.json)
+[![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 
 # Genetic Algorithms – Knapsack Problem
 
@@ -66,13 +69,18 @@ This section describes how to set up a full development environment, run tests, 
 
 Install the project in editable mode together with all development tools:
 
+```bash
+# windows and linux
+pip install -e .[dev]
 ```
+```bash
+# macos
 pip install -e '.[dev]'
 ```
 
 Then install pre-commit hooks:
 
-```
+```bash
 pre-commit install
 ```
 
@@ -80,7 +88,7 @@ pre-commit install
 
 From the project root:
 
-```
+```bash
 pytest
 ```
 
@@ -88,7 +96,7 @@ pytest
 
 Code style and static analysis:
 
-```
+```bash
 ruff check src tests
 black --check src tests
 mypy src
@@ -98,7 +106,7 @@ mypy src
 
 To measure code coverage:
 
-```
+```bash
 coverage run -m pytest
 coverage report
 ```
