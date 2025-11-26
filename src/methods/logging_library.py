@@ -31,6 +31,8 @@ def initialize(config: ExperimentConfig, paths: PathResolver) -> LoggerAdapter:
         level = logging.getLevelName(log_level.upper())
     except ValueError:
         level = logging.INFO
+    if isinstance(level, str):
+        level = logging.INFO
 
     main_logger = logging.getLogger("GA experiment run")
     main_logger.setLevel(level)
