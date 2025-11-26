@@ -69,13 +69,18 @@ This section describes how to set up a full development environment, run tests, 
 
 Install the project in editable mode together with all development tools:
 
+```bash
+# windows and linux
+pip install -e .[dev]
 ```
+```bash
+# macos
 pip install -e '.[dev]'
 ```
 
 Then install pre-commit hooks:
 
-```
+```bash
 pre-commit install
 ```
 
@@ -83,7 +88,7 @@ pre-commit install
 
 From the project root:
 
-```
+```bash
 pytest
 ```
 
@@ -91,7 +96,7 @@ pytest
 
 Code style and static analysis:
 
-```
+```bash
 ruff check src tests
 black --check src tests
 mypy src
@@ -101,7 +106,7 @@ mypy src
 
 To measure code coverage:
 
-```
+```bash
 coverage run -m pytest
 coverage report
 ```
