@@ -38,8 +38,9 @@ jobs:
         run: |
           coverage run -m pytest
           mkdir -p .github
-          coverage json -o /tmp/coverage.json
+          coverage json -o .github/coverage.json
           python .github/json_analyzer.py
+          cp .github/coverage.json /tmp/coverage.json
 
       - name: Commit coverage json
         env:
