@@ -1,6 +1,7 @@
 name: coverage
 
 on:
+  pull_request:
   push:
     branches:
       - main
@@ -37,19 +38,26 @@ jobs:
         run: |
           coverage run -m pytest
           mkdir -p .github
-          coverage json -o .github/coverage.json
+          coverage json -o /tmp/coverage.json
           python .github/json_analyzer.py
 
       - name: Commit coverage json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
+
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
+          
+          git checkout --orphan coverage_score
+
+          git rm -rf .
+          git clean -fdx
+          mkdir -p .github
+          cp /tmp/coverage.json .github/coverage.json
+
           git add -f .github/coverage.json
           git commit -m "Update coverage badge [skip ci]"
-      - name: Push coverage json
-        uses: ad-m/github-push-action@v1.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: coverage_score
-          force: true
-          
+
+          git push --force origin HEAD:coverage_score
