@@ -3,7 +3,19 @@ name: CI
 on:
   push:
     branches: [ main ]
+    paths:
+      - "**/*.toml"
+      - "**/*.yaml"
+      - "**/*.py"
+      - ".github/**"
+
   pull_request:
+    paths:
+      - "**/*.toml"
+      - "**/*.yaml"
+      - "**/*.py"
+      - ".github/**"
+
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
