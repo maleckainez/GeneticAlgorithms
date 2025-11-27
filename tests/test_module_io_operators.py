@@ -12,6 +12,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 import yaml
+from pydantic import ValidationError
 from src.methods.data_loader import load_data, load_yaml_config
 from src.methods.memmap_operations import create_memmap_config_json, load_memmap
 
@@ -284,14 +285,14 @@ def test_load_yaml_config_returns_expected_dict(tmp_path):
             "selection_pressure": 0.8,
         },
         "genetic_operators": {
-            "crossover_type": "one_point",
+            "crossover_type": "one",
             "crossover_probability": 0.9,
             "mutation_probability": 0.05,
             "penalty_multiplier": 2.0,
         },
         "experiment": {
             "seed": 42,
-            "identifier": "test_experiment",
+            "identifier": 1022,
             "log_level": "INFO",
         },
     }
@@ -299,6 +300,7 @@ def test_load_yaml_config_returns_expected_dict(tmp_path):
     with open(config_path, "w") as f:
         yaml.safe_dump(yaml_content, f)
     result = load_yaml_config(config_path)
+    print(result)
     expected = {
         "data_filename": "items.csv",
         "max_weight": 100,
@@ -307,12 +309,12 @@ def test_load_yaml_config_returns_expected_dict(tmp_path):
         "stream_batch_size": 10,
         "selection_type": "tournament",
         "selection_pressure": 0.8,
-        "crossover_type": "one_point",
+        "crossover_type": "one",
         "crossover_probability": 0.9,
         "mutation_probability": 0.05,
         "penalty": 2.0,
         "seed": 42,
-        "experiment_identifier": "test_experiment",
+        "experiment_identifier": 1022,
         "log_level": "INFO",
     }
 
@@ -338,5 +340,5 @@ def test_load_yaml_config_missing_data_section(tmp_path: Path) -> None:
     config_path = tmp_path / "config.yaml"
     with open(config_path, "w") as f:
         yaml.safe_dump(yaml_content, f)
-    with pytest.raises(KeyError):
+    with pytest.raises(ValidationError):
         load_yaml_config(config_path)
