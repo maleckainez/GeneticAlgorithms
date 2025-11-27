@@ -2,8 +2,9 @@
 
 from fastapi import APIRouter
 
-from src.api.schemas import JobConfig, JobStatus, JobStatusResponse
+from src.api.schemas import JobStatusResponse
 from src.api.services.runner import get_job_list, get_status, submit_job
+from src.config.schemas import JobConfig, JobStatus
 
 router = APIRouter(prefix="/backend", tags=["backend"])
 
