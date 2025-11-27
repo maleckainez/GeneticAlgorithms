@@ -6,6 +6,8 @@ from pathlib import Path
 import numpy as np
 import yaml
 
+from src.config.schemas import JobConfig
+
 
 def load_data(path: str | Path) -> np.ndarray:
     """Load item data from a text file.
@@ -72,23 +74,21 @@ def load_yaml_config(filepath: Path | str) -> dict:
     with open(filepath, "r") as file:
         yaml_file = yaml.safe_load(file)
 
-    yaml_config = {
-        "data_filename": yaml_file["data"]["filename"],
-        "max_weight": yaml_file["data"]["max_weight"],
-        "population_size": yaml_file["population"]["size"],
-        "generations": yaml_file["population"]["generations"],
-        "stream_batch_size": yaml_file["population"]["stream_batch_size"],
-        "selection_type": yaml_file["selection"]["type"],
-        "selection_pressure": yaml_file["selection"]["selection_pressure"],
-        "crossover_type": yaml_file["genetic_operators"]["crossover_type"],
-        "crossover_probability": yaml_file["genetic_operators"][
-            "crossover_probability"
-        ],
-        "mutation_probability": yaml_file["genetic_operators"]["mutation_probability"],
-        "penalty": yaml_file["genetic_operators"]["penalty_multiplier"],
-        "seed": yaml_file["experiment"]["seed"],
-        "experiment_identifier": yaml_file["experiment"]["identifier"],
-        "log_level": yaml_file["experiment"]["log_level"],
-    }
+    job = JobConfig.model_validate(yaml_file)
 
-    return yaml_config
+    return {
+        "data_filename": job.data.filename,
+        "max_weight": job.data.max_weight,
+        "population_size": job.population.size,
+        "generations": job.population.generations,
+        "stream_batch_size": job.population.stream_batch_size,
+        "selection_type": job.selection.type.value,  # Enum → str
+        "selection_pressure": job.selection.selection_pressure,
+        "crossover_type": job.genetic_operators.crossover_type.value,
+        "crossover_probability": job.genetic_operators.crossover_probability,
+        "mutation_probability": job.genetic_operators.mutation_probability,
+        "penalty": job.genetic_operators.penalty_multiplier,
+        "seed": job.experiment.seed,
+        "experiment_identifier": job.experiment.identifier,
+        "log_level": job.experiment.log_level.value,  # Enum → str
+    }
