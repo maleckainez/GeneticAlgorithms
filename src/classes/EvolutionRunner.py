@@ -12,6 +12,7 @@ from src.classes.PathResolver import PathResolver
 from src.classes.Plotter import Plotter
 from src.classes.PopulationHandler import PopulationHandler as PopHandler
 from src.classes.Reproduction import Reproduction
+from src.classes.Timer import Timer
 from src.methods.experiment_defining_tools import create_unique_experiment_name
 from src.methods.fitness_score import calc_fitness_score_batched
 from src.methods.selection_methods import (
@@ -78,6 +79,9 @@ class EvolutionRunner:
         self.csv_logger = OutputGenerator(self.paths, self.config)
         self.csv_logger.init_csv(self.config)
 
+        # define timer
+        self.timer = Timer(self.logger, self.config)
+
     def _initialize_first_generation(self) -> None:
         """Create initial population and log generation zero."""
         self.population_manager = PopHandler(
@@ -114,6 +118,7 @@ class EvolutionRunner:
         """Run all generations: selection, crossover, evaluation, and logging."""
         try:
             for iteration in range(1, self.generations + 1):
+                self.timer.start(iteration)
                 parent_pool = self.selection_function(
                     fitness_arr=self.fitness, config=self.config
                 )
@@ -135,6 +140,7 @@ class EvolutionRunner:
                     pop_manager=self.population_manager,
                 )
                 self._log_and_save(iteration)
+                self.timer.stop(iteration)
         finally:
             self.csv_logger.close()
             self.population_manager.close()

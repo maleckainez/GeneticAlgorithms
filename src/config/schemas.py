@@ -1,6 +1,7 @@
 """Defines schemas for pydantic config validation."""
 
 from enum import Enum
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -72,7 +73,7 @@ class GeneticOperatorsConfig(BaseModel):
 class ExperimentVals(BaseModel):
     """Experiment metadata and logging level."""
 
-    seed: int
+    seed: Optional[int] = None
     identifier: int
     log_level: LogLevel
 
