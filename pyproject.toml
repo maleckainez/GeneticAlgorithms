@@ -34,6 +34,7 @@ dependencies = [
   "pandas>=2.0",
   "matplotlib>=3.7",
   "PyYAML>=6.0",
+  "pydantic>=2.4"
 ]
 
 [project.optional-dependencies]
