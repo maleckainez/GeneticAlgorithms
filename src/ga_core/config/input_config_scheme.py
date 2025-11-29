@@ -1,4 +1,4 @@
-"""Defines schemas for pydantic config validation."""
+"""Validation schemas for GA input configuration."""
 
 from __future__ import annotations
 
@@ -6,14 +6,6 @@ from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
-
-
-class JobStatus(str, Enum):
-    """Lifecycle states for a GA job."""
-
-    PENDING = "pending"
-    RUNNING = "running"
-    FINISHED = "finished"
 
 
 class SelectionType(str, Enum):
@@ -42,21 +34,14 @@ class LogLevel(str, Enum):
 
 
 class DataConfig(BaseModel):
-    """Dataset source and weight constraint configuration.
+    """Dataset source and weight constraint configuration."""
 
-    Captures the source filename and the per-instance maximum weight.
-    """
-
-    filename: str
+    data_filename: str
     max_weight: int = Field(gt=0, description="Max weight must be greater than 0.")
 
 
 class PopulationConfig(BaseModel):
-    """Population size and iteration settings.
-
-    Enforces an even population size, positive generation count, and
-    batch size used for memmap streaming.
-    """
+    """Population size and iteration settings."""
 
     size: int = Field(
         ge=10, description="Population must count at least 10 individuals and be even."
@@ -71,18 +56,24 @@ class PopulationConfig(BaseModel):
     @field_validator("size")
     @classmethod
     def size_must_be_even(cls, v: int) -> int:
-        """Ensure population size is an even number."""
+        """Ensure population size is an even number.
+
+        Args:
+            v: Proposed population size.
+
+        Raises:
+            ValueError: If the size is odd.
+
+        Returns:
+            int: The validated even size.
+        """
         if v % 2 != 0:
             raise ValueError("Population size must be even!")
         return v
 
 
 class SelectionConfig(BaseModel):
-    """Selection strategy parameters.
-
-    Validates auxiliary fields required by the chosen selection type
-    (selection_pressure for rank, tournament_size for tournament).
-    """
+    """Selection strategy parameters and auxiliary fields."""
 
     type: SelectionType
     selection_pressure: Optional[float]
@@ -90,7 +81,14 @@ class SelectionConfig(BaseModel):
 
     @model_validator(mode="after")
     def validate_rank_selection(self) -> SelectionConfig:
-        """Guard linear rank configuration (selection_pressure in [1.0, 2.0])."""
+        """Guard linear rank configuration.
+
+        Raises:
+            ValueError: If ``selection_pressure`` is missing or out of bounds.
+
+        Returns:
+            SelectionConfig: The validated instance.
+        """
         if self.type == SelectionType.LINEAR_RANK:
             if self.selection_pressure is None:
                 raise ValueError("Selection pressure not specified !")
@@ -100,7 +98,14 @@ class SelectionConfig(BaseModel):
 
     @model_validator(mode="after")
     def validate_tornament_size(self) -> SelectionConfig:
-        """Guard tournament configuration (tournament_size in [2, 10])."""
+        """Guard tournament configuration.
+
+        Raises:
+            ValueError: If ``tournament_size`` is missing or out of bounds.
+
+        Returns:
+            SelectionConfig: The validated instance.
+        """
         if self.type == SelectionType.TOURNAMENT:
             if self.tournament_size is None:
                 raise ValueError("Tournament size not specified!")
@@ -130,7 +135,11 @@ class GeneticOperatorsConfig(BaseModel):
 
     @model_validator(mode="after")
     def apply_weight_constraint(self) -> GeneticOperatorsConfig:
-        """Set penalty to 0 when strict_weight_constraints is enabled."""
+        """Set penalty to 0 when strict_weight_constraints is enabled.
+
+        Returns:
+            GeneticOperatorsConfig: The validated instance with updated penalty.
+        """
         if self.strict_weight_constraints:
             self.penalty_multiplier = 0.0
         return self
@@ -140,12 +149,12 @@ class ExperimentVals(BaseModel):
     """Experiment metadata and logging level."""
 
     seed: Optional[int] = None
-    identifier: int
-    log_level: LogLevel
+    identifier: Optional[str] = None
+    log_level: LogLevel = LogLevel.INFO
 
 
-class JobConfig(BaseModel):
-    """Aggregate configuration for a GA run."""
+class InputConfig(BaseModel):
+    """Aggregate external input configuration for a GA run."""
 
     data: DataConfig
     population: PopulationConfig
