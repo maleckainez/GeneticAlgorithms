@@ -24,7 +24,7 @@ def _resolve_level(log_level: str) -> int:
     """
     level = logging.getLevelName(log_level.upper())
     if isinstance(level, str):
-        raise ValueError("Logger level was set incorrectly")
+        level = 50
     return level
 
 
@@ -84,13 +84,13 @@ def from_config_and_layout(
 def from_config(config: ExperimentConfig, log_path: Path) -> LoggerAdapter:
     """Initialize a logger using experiment config and an explicit log path."""
     return initialize(
-        log_level=config.input.experiment.log_level,
+        log_level=config.log_level,
         log_path=log_path,
         file_name=config.job_id,
     )
 
 
-def from_layout(log_level: str, layout: StorageLayout, file_name: str):
+def from_layout(log_level: str, layout: StorageLayout, file_name: str) -> LoggerAdapter:
     """Initialize a logger using only a layout and explicit parameters."""
     return initialize(
         log_level=log_level,

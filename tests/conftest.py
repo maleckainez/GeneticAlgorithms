@@ -10,6 +10,7 @@ from typing import Optional
 
 import numpy as np
 import pytest
+from pandas import DataFrame
 from src.ga_core.config import ExperimentConfig as CoreExperimentConfig
 from src.ga_core.config import InputConfig
 from src.ga_core.storage import ExperimentStorage
@@ -220,3 +221,16 @@ def clean_experiment_logger() -> logging.Logger:
         except Exception:
             pass
     logger.setLevel(logging.NOTSET)
+
+
+@pytest.fixture
+def sample_run_data() -> DataFrame:
+    """Return a minimal run-data DataFrame for plotting tests."""
+    return DataFrame(
+        {
+            "iteration": [0, 1, 2],
+            "best_fitness": [1, 2, 3],
+            "avg_fitness": [0.5, 1.5, 2.5],
+            "worst_fitness": [0, 1, 2],
+        }
+    )

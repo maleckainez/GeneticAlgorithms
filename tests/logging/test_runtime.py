@@ -3,7 +3,6 @@
 import logging
 from pathlib import Path
 
-import pytest
 from src.ga_core.logging.runtime import (
     from_config,
     from_config_and_layout,
@@ -33,11 +32,11 @@ def test_initialize_creates_handlers_and_log_file(
     assert "hello logger" in log_file.read_text()
 
 
-def test_initialize_rejects_invalid_level(
+def test_initialize_sets_invalid_level_to_critical(
     tmp_path: Path, clean_experiment_logger: logging.Logger
 ) -> None:
-    with pytest.raises(ValueError):
-        initialize(log_level="INVALID", log_path=tmp_path, file_name="job1")
+    logger = initialize(log_level="INVALID", log_path=tmp_path, file_name="job1")
+    assert logger.getEffectiveLevel() == logging.CRITICAL
 
 
 def test_initialize_does_not_duplicate_handlers(
