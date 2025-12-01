@@ -5,12 +5,20 @@ utilities needed by runners, such as RNG creation and probability estimation for
 overweight genomes.
 """
 
+# due to propeties below, ruff must be silenced
+# ruff: noqa: D102
+
 from pathlib import Path
 
 from numpy.random import Generator, default_rng
 from pydantic import BaseModel
 
-from .input_config_scheme import InputConfig
+from .input_config_scheme import (
+    CrossoverType,
+    InputConfig,
+    LogLevel,
+    SelectionType,
+)
 
 
 class ExperimentConfig(BaseModel):
@@ -61,3 +69,67 @@ class ExperimentConfig(BaseModel):
     def as_dict(self) -> dict:
         """Return the configuration as a plain dictionary."""
         return self.model_dump()
+
+    @property
+    def data_filename(self) -> str:
+        return self.input.data.data_filename
+
+    @property
+    def max_weight(self) -> int:
+        return self.input.data.max_weight
+
+    @property
+    def population_size(self) -> int:
+        return self.input.population.size
+
+    @property
+    def generations(self) -> int:
+        return self.input.population.generations
+
+    @property
+    def stream_batch_size(self) -> int:
+        return self.input.population.stream_batch_size
+
+    @property
+    def selection_type(self) -> SelectionType:
+        return self.input.selection.type
+
+    @property
+    def selection_pressure(self) -> float | None:
+        return self.input.selection.selection_pressure
+
+    @property
+    def tournament_size(self) -> int | None:
+        return self.input.selection.tournament_size
+
+    @property
+    def crossover_type(self) -> CrossoverType:
+        return self.input.genetic_operators.crossover_type
+
+    @property
+    def crossover_probability(self) -> float:
+        return self.input.genetic_operators.crossover_probability
+
+    @property
+    def mutation_probability(self) -> float:
+        return self.input.genetic_operators.mutation_probability
+
+    @property
+    def penalty_multiplier(self) -> float:
+        return self.input.genetic_operators.penalty_multiplier
+
+    @property
+    def strict_weight_constraints(self) -> bool:
+        return self.input.genetic_operators.strict_weight_constraints
+
+    @property
+    def seed(self) -> int | None:
+        return self.input.experiment.seed
+
+    @property
+    def experiment_identifier(self) -> str | None:
+        return self.input.experiment.identifier
+
+    @property
+    def log_level(self) -> LogLevel:
+        return self.input.experiment.log_level
