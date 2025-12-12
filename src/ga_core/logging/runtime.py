@@ -6,6 +6,7 @@ from pathlib import Path
 
 from src.ga_core.config import ExperimentConfig
 from src.ga_core.storage import StorageLayout
+from src.ga_core.storage.naming_scheme import NAMING
 
 _LOGGER_NAME = "ga_core.experiment"
 
@@ -41,7 +42,7 @@ def initialize(log_level: str, log_path: Path, file_name: str) -> LoggerAdapter:
     Returns:
         LoggerAdapter: Configured adapter instance for this experiment.
     """
-    filepath = log_path / f"runtime_experiment_{file_name}.log"
+    filepath = log_path / NAMING.log_file(file_name)
 
     level = _resolve_level(log_level=log_level)
 
@@ -66,7 +67,7 @@ def initialize(log_level: str, log_path: Path, file_name: str) -> LoggerAdapter:
 
     adapter = logging.LoggerAdapter(main_logger, {"experiment_name": file_name})
     adapter.debug("--- LOG CONFIG FINISHED ---")
-    adapter.debug(f"Log files saved as: runtime_experiment_{file_name}.log\n")
+    adapter.debug(f"Log files saved as: {NAMING.log_file(file_name)}\n")
     return adapter
 
 

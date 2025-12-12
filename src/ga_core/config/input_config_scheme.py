@@ -33,6 +33,13 @@ class LogLevel(str, Enum):
     CRITICAL = "CRITICAL"
 
 
+class SwapType(str, Enum):
+    """Supported method of handling temporary binary population files."""
+
+    FLIP = "flip"
+    ATOMIC = "atomic"
+
+
 class DataConfig(BaseModel):
     """Dataset source and weight constraint configuration."""
 
@@ -50,8 +57,12 @@ class PopulationConfig(BaseModel):
         gt=0, description="Number 0f generations should be greater than 0."
     )
     stream_batch_size: int = Field(
-        default=500, gt=0, description="Batch size must be > 0"
+        default=500,
+        gt=0,
+        le=10000,
+        description="Batch size must be > 0 and < 10'000 to avoid memmory overflow.",
     )
+    commit_mode: SwapType = SwapType.FLIP
 
     @field_validator("size")
     @classmethod
@@ -150,7 +161,7 @@ class ExperimentVals(BaseModel):
 
     seed: Optional[int] = None
     identifier: Optional[str] = None
-    log_level: LogLevel = LogLevel.INFO
+    log_level: LogLevel = LogLevel.CRITICAL
 
 
 class InputConfig(BaseModel):

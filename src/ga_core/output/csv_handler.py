@@ -9,6 +9,8 @@ from pathlib import Path
 from types import TracebackType
 from typing import Any, Optional, TextIO
 
+from src.ga_core.storage.naming_scheme import NAMING
+
 
 class CsvHandler:
     """Open, write, and close experiment CSV outputs."""
@@ -20,7 +22,7 @@ class CsvHandler:
             output_path: Directory where the CSV file will be written.
             exp_filename: Base filename without extension.
         """
-        self._filename = output_path / f"{exp_filename}.csv"
+        self._filename = output_path / NAMING.csv_file(exp_filename)
         self._file: Optional[TextIO] = None
         self._writer: Optional[Any] = None
 

@@ -1,8 +1,4 @@
-"""Storage utilities for population and children memmap files.
-
-The helpers here encapsulate file naming, validation, and atomic swapping of
-population arrays.
-"""
+"""Storage utilities for population and children memmap files."""
 
 import json
 import os
@@ -13,48 +9,23 @@ from typing import Literal, Union
 
 import numpy as np
 
-from .layout import StorageLayout
+from .naming_scheme import NAMING
 
 LoggerType = Union[Logger, LoggerAdapter, None]
 
 
-def population_filepath(layout: StorageLayout, file_name: str) -> Path:
-    """Return memmap path for the main population file.
-
-    The file is stored in the temporary directory associated with the given
-    storage layout. The ``.dat`` extension is appended to ``file_name``.
-
-    Args:
-        layout: Storage layout that provides the temporary directory.
-        file_name: Base name of the population file without extension.
-
-    Returns:
-        Path: Absolute path to the population memmap file in the temporary
-        directory.
-    """
-    return layout.temp / f"{file_name}.dat"
+def population_name_convention(file_name: str) -> str:
+    """Return canonical population filename for a given job id."""
+    return NAMING.population_file(file_name)
 
 
-def children_filepath(layout: StorageLayout, file_name: str) -> Path:
-    """Return memmap path for the temporary children file.
-
-    The file is stored in the temporary directory associated with the given
-    storage layout. The ``.dat`` extension is appended to ``file_name`` and
-    the name is prefixed with ``child_``.
-
-    Args:
-        layout: Storage layout that provides the temporary directory.
-        file_name: Base name of the children file without extension.
-
-    Returns:
-        Path: Absolute path to the children memmap file in the temporary
-        directory.
-    """
-    return layout.temp / f"child_{file_name}.dat"
+def children_name_convention(file_name: str) -> str:
+    """Return canonical children filename for a given job id."""
+    return NAMING.children_file(file_name)
 
 
 def commit_children(
-    layout: StorageLayout,
+    temp_path: Path,
     file_name: str,
     expected_size: int,
     retries: int = 3,
@@ -67,7 +38,7 @@ def commit_children(
     used to reduce the risk of transient ``PermissionError`` exceptions.
 
     Args:
-        layout: Storage layout that provides the temporary directory.
+        temp_path: Temporary directory containing population and children files.
         file_name: Base name used for population and children memmap files
             (without extension).
         expected_size: Required file size of the children file in bytes. A
@@ -81,8 +52,8 @@ def commit_children(
         RuntimeError: If the children file is missing, has an unexpected
             size, or the replacement fails after all retries.
     """
-    child = children_filepath(layout=layout, file_name=file_name)
-    population = population_filepath(layout=layout, file_name=file_name)
+    child = temp_path / children_name_convention(file_name)
+    population = temp_path / population_name_convention(file_name)
     if not child.exists():
         if logger is not None:
             logger.error("Missing children file %s", child)
@@ -132,10 +103,17 @@ def commit_children(
     )
 
 
-def create_population_file(
+def create_empty_array(
+    population_size: int, genome_length: int, data_type: type = np.uint8
+) -> np.ndarray:
+    """Return a zero-initialised ndarray for a population."""
+    return np.zeros(shape=(population_size, genome_length), dtype=data_type)
+
+
+def create_empty_memmap(
     population_size: int,
     genome_length: int,
-    temp: Path,
+    temp_path: Path,
     filename: str,
     data_type: type = np.uint8,
 ) -> None:
@@ -148,13 +126,13 @@ def create_population_file(
     Args:
         population_size (int): Number of individuals in the population.
         genome_length (int): Number of genes in a single genome.
-        temp (Path): Directory where memmap and JSON files are stored.
+        temp_path (Path): Directory where memmap and JSON files are stored.
         filename (str): Base name for the ``.dat`` and ``.json`` files.
         data_type (type): NumPy-compatible data type used to store the
             population.
     """
-    population_dat = temp / f"{filename}.dat"
-    population_json = temp / f"{filename}.json"
+    population_dat = temp_path / NAMING.population_file(filename)
+    population_json = temp_path / NAMING.population_file(filename)
     np.memmap(
         filename=population_dat,
         dtype=data_type,

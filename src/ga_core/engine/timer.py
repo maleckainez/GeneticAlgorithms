@@ -10,10 +10,10 @@ from logging import Logger, LoggerAdapter
 from time import perf_counter
 from typing import Optional, Union
 
-from src.classes.ExperimentConfig import ExperimentConfig
-from src.config.schemas import JobConfig
+from src.ga_core.config.experiment_config import ExperimentConfig
+from src.ga_core.config.input_config_scheme import InputConfig
 
-ConfigLike = Union[int, ExperimentConfig, JobConfig, None]
+ConfigLike = Union[int, ExperimentConfig, InputConfig, None]
 LoggerType = Union[Logger, LoggerAdapter, None]
 
 
@@ -79,9 +79,9 @@ class Timer:
 
     @classmethod
     def with_job_config(
-        cls, job_config: JobConfig, logger: LoggerType = None
+        cls, job_config: InputConfig, logger: LoggerType = None
     ) -> "Timer":
-        """Create a timer from a validated ``JobConfig`` instance."""
+        """Create a timer from a validated ``InputConfig`` instance."""
         return cls(config_like=job_config, logger=logger)
 
     @classmethod
@@ -108,7 +108,7 @@ class Timer:
             return config_like
         if isinstance(config_like, ExperimentConfig):
             return config_like.generations
-        if isinstance(config_like, JobConfig):
+        if isinstance(config_like, InputConfig):
             return config_like.population.generations
         if config_like is None:
             return None

@@ -10,6 +10,12 @@ The default high-level entry point is ``ExperimentStorage``.
 
 from .experiment_storage import ExperimentStorage
 from .layout import StorageLayout
-from .path_resolver import PathResolver
+from .naming_scheme import NAMING, DefaultFileNamingScheme, FileNamingScheme
 
-__all__ = ["StorageLayout", "PathResolver", "ExperimentStorage"]
+__all__ = [
+    "StorageLayout",
+    "ExperimentStorage",
+    "NAMING",
+    "DefaultFileNamingScheme",
+    "FileNamingScheme",
+]

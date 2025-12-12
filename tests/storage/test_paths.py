@@ -1,34 +1,37 @@
 """Tests for storage path resolution and directory helpers.
 
-These tests cover PathResolver behavior and utilities that prepare or clean up
+These tests cover storage layout behavior and utilities that prepare or clean up
 experiment directories.
 """
 
 from pathlib import Path
 
 import pytest
-from src.ga_core.storage import PathResolver, data_paths
+from src.ga_core.engine.population.directory_manager import DirectoryManager
+from src.ga_core.storage import data_paths
 from src.ga_core.storage.directory_utils import cleanup_temp, ensure_layout_paths
 
 
 def test_path_resolver_defines_layout_without_creating_dirs(tmp_path: Path) -> None:
+    """Test that storage layout defines paths without creating directories."""
     root = tmp_path / "experiment"
-    resolver = PathResolver(root)
+    layout = DirectoryManager(root)
 
-    assert resolver.temp == root / "temp"
-    assert resolver.output == root / "output"
-    assert resolver.logs == root / "logs"
-    assert resolver.plots == root / "output" / "plots"
-    assert not resolver.temp.exists()
-    assert not resolver.output.exists()
-    assert not resolver.logs.exists()
-    assert not resolver.plots.exists()
+    assert layout.temp == root / "temp"
+    assert layout.output == root / "output"
+    assert layout.logs == root / "logs"
+    assert layout.plots == root / "output" / "plots"
+    assert not layout.temp.exists()
+    assert not layout.output.exists()
+    assert not layout.logs.exists()
+    assert not layout.plots.exists()
 
 
 def test_ensure_layout_paths_creates_directories_and_cleanup_removes_temp(
     tmp_path: Path,
 ) -> None:
-    layout = PathResolver(tmp_path / "run")
+    """Test that ensure_layout_paths creates dirs and cleanup_temp removes temp."""
+    layout = DirectoryManager(tmp_path / "run")
     ensure_layout_paths(layout)
 
     for path in (layout.temp, layout.output, layout.logs, layout.plots):

@@ -18,6 +18,7 @@ from .input_config_scheme import (
     InputConfig,
     LogLevel,
     SelectionType,
+    SwapType,
 )
 
 
@@ -89,6 +90,10 @@ class ExperimentConfig(BaseModel):
     @property
     def stream_batch_size(self) -> int:
         return self.input.population.stream_batch_size
+
+    @property
+    def commit_mode(self) -> SwapType:
+        return self.input.population.commit_mode
 
     @property
     def selection_type(self) -> SelectionType:

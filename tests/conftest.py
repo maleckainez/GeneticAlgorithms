@@ -14,16 +14,15 @@ from pandas import DataFrame
 from src.ga_core.config import ExperimentConfig as CoreExperimentConfig
 from src.ga_core.config import InputConfig
 from src.ga_core.storage import ExperimentStorage
-from src.ga_core.storage import PathResolver as CorePathResolver
 from src.ga_core.storage.data_paths import resolve_data_dict_path, resolve_optimum_file
 from src.ga_core.storage.directory_utils import cleanup_temp, ensure_layout_paths
+from src.ga_core.storage.layout import StorageLayout
 from src.ga_core.storage.population_files import (
-    children_filepath,
     commit_children,
 )
 
 
-class CompatPathResolver(CorePathResolver):
+class CompatPathResolver(StorageLayout):
     """Provide the legacy PathResolver interface backed by the storage API."""
 
     PROJECT_ROOT = Path.cwd()
@@ -31,9 +30,33 @@ class CompatPathResolver(CorePathResolver):
     def __init__(self, root: Path | None = None) -> None:
         if root is None:
             root = self.PROJECT_ROOT
-        super().__init__(root)
+        self._root = root
         self.PROJECT_ROOT = root
         self.filename_constant: Optional[str] = None
+        self._temp = root / "temp"
+        self._output = root / "output"
+        self._logs = root / "logs"
+        self._plots = root / "output" / "plots"
+
+    @property
+    def temp(self) -> Path:
+        """Return path to temporary files directory."""
+        return self._temp
+
+    @property
+    def output(self) -> Path:
+        """Return path to output files directory."""
+        return self._output
+
+    @property
+    def logs(self) -> Path:
+        """Return path to logs directory."""
+        return self._logs
+
+    @property
+    def plots(self) -> Path:
+        """Return path to plots directory."""
+        return self._plots
 
     def initialize(self, filename_constant: str) -> None:
         self.filename_constant = filename_constant
@@ -63,12 +86,6 @@ class CompatPathResolver(CorePathResolver):
         ensure_layout_paths(self)
         self.plots.mkdir(parents=True, exist_ok=True)
         return self.plots
-
-    def get_children_filepath(self) -> Path:
-        self._ensure_initialized()
-        ensure_layout_paths(self)
-        assert self.filename_constant is not None
-        return children_filepath(self, self.filename_constant)
 
     def get_dict_filepath(self, data_file_name: str) -> Path:
         self._ensure_initialized()
@@ -150,9 +167,9 @@ def storage_root(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def storage_layout(storage_root: Path) -> CorePathResolver:
+def storage_layout(storage_root: Path) -> CompatPathResolver:
     """Provide a prepared layout under a temporary experiment root."""
-    layout = CorePathResolver(storage_root)
+    layout = CompatPathResolver(storage_root)
     ensure_layout_paths(layout)
     return layout
 

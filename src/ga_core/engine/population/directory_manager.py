@@ -1,16 +1,16 @@
-"""Resolve experiment file paths relative to a single root.
+"""Resolve and manage experiment file paths relative to a single root.
 
-``PathResolver`` implements ``StorageLayout`` using simple subdirectories
+``DirectoryManager`` implements ``StorageLayout`` using simple subdirectories
 (``temp``, ``output``, ``logs``, ``plots``) under a provided root. It keeps the
 storage contract explicit while remaining minimal for testability.
 """
 
 from pathlib import Path
 
-from .layout import StorageLayout
+from src.ga_core.storage.layout import StorageLayout
 
 
-class PathResolver(StorageLayout):
+class DirectoryManager(StorageLayout):
     """Compute experiment directory paths under a given filesystem root.
 
     This class does not create directories. It only defines where temporary data,

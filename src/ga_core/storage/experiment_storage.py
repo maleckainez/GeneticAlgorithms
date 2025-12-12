@@ -15,13 +15,11 @@ import numpy as np
 from .data_paths import resolve_data_dict_path, resolve_optimum_file
 from .directory_utils import cleanup_temp, ensure_layout_paths
 from .layout import StorageLayout
-from .path_resolver import PathResolver
+from .naming_scheme import NAMING, FileNamingScheme
 from .population_files import (
-    children_filepath,
     commit_children,
-    create_population_file,
+    create_empty_memmap,
     load_memmap,
-    population_filepath,
 )
 
 LoggerType = Union[Logger, LoggerAdapter, None]
@@ -38,69 +36,38 @@ class ExperimentStorage:
     def __init__(
         self,
         layout: StorageLayout,
-        filename: str,
+        job_id: str,
         data_file_name: str,
+        naming: FileNamingScheme = NAMING,
         logger: LoggerType = None,
     ) -> None:
         """Create storage helper with pre-resolved names and optional logger.
 
         Args:
             layout: Concrete ``StorageLayout`` implementation for this run.
-            filename: Base name used for population and children files (without
+            job_id: Base name used for population and children files (without
                 extension).
             data_file_name: Filename of the input dataset used by the
                 experiment.
+            naming: Strategy that defines file naming conventions.
             logger: Optional logger or adapter for informational or debug
                 messages.
         """
         self._layout = layout
-        self._file_name = filename
+        self._file_name = job_id
         self._data_file_name = data_file_name
+        self._naming = naming
         self._logger = logger
         if self._logger is not None:
             self._logger.debug("ExperimentStorage initialized successfully.")
 
-    @classmethod
-    def from_root(
-        cls, root: Path, filename: str, data_file_name: str, logger: LoggerType = None
-    ) -> "ExperimentStorage":
-        """Create storage at ``root`` and ensure required directories exist.
+    def children_name(self) -> str:
+        """Return string name of the children memmap file."""
+        return self._naming.children_file(self._file_name)
 
-        Use this constructor when starting a new experiment. It prepares all
-        directories needed to store populations, logs, outputs, and temporary
-        data under ``root``.
-
-        Args:
-            root: Base directory for the experiment's artefacts.
-            filename: Base name used for population and children files (without
-                extension).
-            data_file_name: File stem of the input dataset used by the
-                experiment.
-            logger: Optional logger or adapter for informational or debug
-                messages.
-
-        Returns:
-            ExperimentStorage: Initialised storage helper ready for use.
-        """
-        layout = PathResolver(root)
-        ensure_layout_paths(layout)
-        if logger is not None:
-            logger.info(
-                "Initialized storage at root %s (experiment file: %s, data file: %s)",
-                root,
-                filename,
-                data_file_name,
-            )
-        return cls(layout, filename, data_file_name)
-
-    def children_path(self) -> Path:
-        """Return path to the temporary children memmap file.
-
-        Returns:
-            Path: Resolved path for the children population file stored
-                in the temporary directory.
-        """
-        return children_filepath(layout=self._layout, file_name=self._file_name)
+    def population_name(self) -> str:
+        """Return string name of the population memmap file."""
+        return self._naming.population_file(self._file_name)
 
     def commit_children(self, expected_size: int, retries: int = 3) -> None:
         """Atomically replace population memmap with children memmap.
@@ -112,21 +79,12 @@ class ExperimentStorage:
                 raising an error.
         """
         commit_children(
-            layout=self._layout,
+            temp_path=self._layout.temp,
             file_name=self._file_name,
             expected_size=expected_size,
             retries=retries,
             logger=self._logger,
         )
-
-    def population_path(self) -> Path:
-        """Return path to the main population memmap file.
-
-        Returns:
-            Path: Resolved path for the main population memmap file stored in
-                the temporary directory.
-        """
-        return population_filepath(layout=self._layout, file_name=self._file_name)
 
     def data_dict_path(self) -> Path:
         """Return path to the input data file for this experiment.
@@ -165,7 +123,7 @@ class ExperimentStorage:
                 self._layout.output.parent,
             )
 
-    def create_population_memmap(
+    def create_empty_memmap(
         self,
         population_size: int,
         genome_length: int,
@@ -177,20 +135,22 @@ class ExperimentStorage:
         directory configured by the storage layout.
 
         Args:
+            filename: Base name used for the memmap file (no extension).
             population_size: Number of individuals in the population.
             genome_length: Number of genes in a single genome.
             data_type: NumPy-compatible data type used to store the population.
         """
-        create_population_file(
+        create_empty_memmap(
             population_size=population_size,
             genome_length=genome_length,
-            temp=self._layout.temp,
-            filename=self._file_name,
+            temp_path=self._layout.temp,
+            filename=self._data_file_name,
             data_type=data_type,
         )
 
-    def load_population_memmap(
+    def load_memmap(
         self,
+        filename: str,
         open_mode: Literal[
             "readonly", "r", "copyonwrite", "c", "readwrite", "r+", "write", "w+"
         ] = "r",
@@ -201,6 +161,7 @@ class ExperimentStorage:
         memmap file.
 
         Args:
+            filename: Base name used for the memmap file (no extension).
             open_mode: NumPy memmap open mode, for example ``"r"`` or
                 ``"r+"``.
 
@@ -209,7 +170,7 @@ class ExperimentStorage:
         """
         population, _ = load_memmap(
             temp=self._layout.temp,
-            filename=self._file_name,
+            filename=filename,
             open_mode=open_mode,
         )
         return population
