@@ -4,7 +4,7 @@ Provides encoding-agnostic facade for creating selection functions,
 fitness evaluators, and reproduction executors based on configuration.
 """
 
-from src.ga_core.config.experiment_config import (
+from src.ga_core.config.input_config_scheme import (
     CrossoverType,
     EncodingType,
     SelectionType,

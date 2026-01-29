@@ -2,7 +2,7 @@
 
 import numpy as np
 import pytest
-from src.ga_core.config.experiment_config import (
+from src.ga_core.config.input_config_scheme import (
     CrossoverType,
     EncodingType,
     SelectionType,
