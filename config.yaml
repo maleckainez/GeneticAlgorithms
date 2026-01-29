@@ -4,7 +4,7 @@
 
 # --- DATA AND FILEPATHS ---
 data:
-  filename: "f2_l-d_kp_20_878"   # Filename without path from "dane AG 2" file
+  data_filename: "f2_l-d_kp_20_878"   # Filename without path from "dane AG 2" file
   max_weight: 878                  # Max weight threshold for GA
 
 # --- POPULATION PARAMETERS ---
@@ -24,10 +24,10 @@ genetic_operators:
   crossover_type: "two"             # Type of crossover method [one, two] (points of slicing)
   crossover_probability: 0.6        # Probability of crossover occurrence (Pc)
   mutation_probability: 0.05         # Probability of mutation occurrence (Pm)
-  penalty_multiplier: 0             # Penalty factor applied after exceeding threshold weight (0 - nullifies fitness if weight exceeded)
+  penalty_multiplier: 2.0             # Penalty factor applied after exceeding threshold weight
 
 # --- EXPERIMENT VARIABLES ---
 experiment:
   seed: 2137                        # Predefined RNG seed (if null, rng will be defined randomly)
-  identifier: 0                     # Experiment identifier (will be defined in next versions)
+  identifier: "test-run"                     # Experiment identifier
   log_level: INFO                   # Level of logged events [DEBUG, INFO, WARNING, ERROR, CRITICAL]
