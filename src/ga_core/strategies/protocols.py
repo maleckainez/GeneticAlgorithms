@@ -4,7 +4,7 @@ This module defines the contracts for all strategy functions used in the GA,
 enabling type checking and ensuring consistent interfaces across implementations.
 """
 
-from typing import Protocol, Sequence
+from typing import Any, Protocol, Sequence
 
 import numpy as np
 
@@ -47,8 +47,8 @@ class SelectionFn(Protocol):
         fitness_arr: np.ndarray,
         population_size: int,
         rng: np.random.Generator,
-        *args,
-        **kwargs,
+        *args: Any,
+        **kwargs: Any,
     ) -> Sequence[int]:
         """Select parents based on fitness.
 
@@ -71,7 +71,9 @@ class FitnessFn(Protocol):
     Evaluates fitness of all individuals in the population.
     """
 
-    def __call__(self, population: PopulationType, *args, **kwargs) -> np.ndarray:
+    def __call__(
+        self, population: PopulationType, *args: Any, **kwargs: Any
+    ) -> np.ndarray:
         """Evaluate fitness of population.
 
         Args:

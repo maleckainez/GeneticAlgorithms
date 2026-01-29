@@ -9,7 +9,7 @@ import numpy as np
 def fitness_calculation(
     max_weight: int,
     penalty_factor: float,
-    population: np.memmap,
+    population: np.ndarray | np.memmap,
     batch_size: int,
     value_arr: np.ndarray,
     weight_arr: np.ndarray,
@@ -19,7 +19,8 @@ def fitness_calculation(
     Args:
         max_weight (int): Maximum allowed total weight.
         penalty_factor (float): Factor used to penalize overweight individuals.
-        population (np.memmap): Binary population matrix (individuals x genes).
+        population (np.ndarray | np.memmap): Binary population matrix
+            (individuals x genes).
         batch_size (int): Batch size used for streaming computation.
         value_arr (np.ndarray): Value of each gene.
         weight_arr (np.ndarray): Weight of each gene.

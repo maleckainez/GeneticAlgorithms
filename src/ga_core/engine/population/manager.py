@@ -126,9 +126,13 @@ class PopulationManager:
         # atomic swap on disk
         self._storage.commit_children(expected_size=expected_size)
         # reload population and recreate children buffer
-        self._population = self._storage.load_population_memmap(open_mode="r+")
-        self._storage.create_empty_children_memmap(
+        self._population = self._storage.load_memmap(
+            filename=self._storage.population_name(), open_mode="r+"
+        )
+        self._storage.create_empty_memmap(
             population_size=self._pop_size,
             genome_length=self._gen_len,
         )
-        self._children = self._storage.load_population_memmap(open_mode="r+")
+        self._children = self._storage.load_memmap(
+            filename=self._storage.population_name(), open_mode="r+"
+        )

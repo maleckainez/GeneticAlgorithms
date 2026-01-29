@@ -4,6 +4,8 @@ Combines selection, pairing, and reproduction strategies into a cohesive
 execution pipeline for one generation of evolution.
 """
 
+from typing import Any, Sequence
+
 import numpy as np
 
 from src.ga_core.engine.population.types import PopulationType
@@ -51,8 +53,8 @@ class StrategyExecutor:
         population: PopulationType,
         children: PopulationType,
         rng: np.random.Generator,
-        **fitness_kwargs,
-    ) -> tuple[list[int], np.ndarray]:
+        **fitness_kwargs: Any,
+    ) -> tuple[Sequence[int], np.ndarray]:
         """Execute one complete generation cycle.
 
         Pipeline:
@@ -85,7 +87,7 @@ class StrategyExecutor:
         return parent_indices, fitness_array
 
     def evaluate_fitness(
-        self, population: PopulationType, **fitness_kwargs
+        self, population: PopulationType, **fitness_kwargs: Any
     ) -> np.ndarray:
         """Evaluate fitness of population.
 

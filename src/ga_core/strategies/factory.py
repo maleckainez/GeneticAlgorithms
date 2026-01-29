@@ -4,6 +4,10 @@ Provides encoding-agnostic facade for creating selection functions,
 fitness evaluators, and reproduction executors based on configuration.
 """
 
+from typing import Any, Sequence
+
+import numpy as np
+
 from src.ga_core.config.input_config_scheme import (
     CrossoverType,
     EncodingType,
@@ -46,19 +50,41 @@ def create_selection_fn(
         Selection function matching SelectionFn protocol.
     """
     if selection_type == SelectionType.ROULETTE:
-        return lambda fitness_arr, pop_size, rng, *args, **kwargs: roulette_selection(
-            fitness_arr, pop_size, rng
-        )
+
+        def _selection(
+            fitness_arr: np.ndarray,
+            pop_size: int,
+            rng: np.random.Generator,
+            *args: Any,
+            **kwargs: Any,
+        ) -> Sequence[int]:
+            return roulette_selection(fitness_arr, pop_size, rng)
+
+        return _selection  # type: ignore[return-value]
     elif selection_type == SelectionType.TOURNAMENT:
-        return lambda fitness_arr, pop_size, rng, *args, **kwargs: tournament_selection(
-            fitness_arr, pop_size, rng, tournament_size
-        )
+
+        def _selection(
+            fitness_arr: np.ndarray,
+            pop_size: int,
+            rng: np.random.Generator,
+            *args: Any,
+            **kwargs: Any,
+        ) -> Sequence[int]:
+            return tournament_selection(fitness_arr, pop_size, rng, tournament_size)
+
+        return _selection  # type: ignore[return-value]
     elif selection_type == SelectionType.LINEAR_RANK:
-        return (
-            lambda fitness_arr, pop_size, rng, *args, **kwargs: linear_rank_selection(
-                fitness_arr, pop_size, rng, selection_pressure
-            )
-        )
+
+        def _selection(
+            fitness_arr: np.ndarray,
+            pop_size: int,
+            rng: np.random.Generator,
+            *args: Any,
+            **kwargs: Any,
+        ) -> Sequence[int]:
+            return linear_rank_selection(fitness_arr, pop_size, rng, selection_pressure)
+
+        return _selection  # type: ignore[return-value]
     else:
         raise ValueError(f"Unknown selection type: {selection_type}")
 
@@ -138,6 +164,6 @@ def create_fitness_fn(encoding: EncodingType) -> FitnessFn:
     if encoding == EncodingType.BINARY:
         from src.ga_core.strategies.binary.fitness_score import fitness_calculation
 
-        return fitness_calculation
+        return fitness_calculation  # type: ignore[return-value]
     else:
         raise ValueError(f"Unsupported encoding type: {encoding}")

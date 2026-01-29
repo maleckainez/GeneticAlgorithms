@@ -55,7 +55,7 @@ def initialize_empty_binary_children(
     ):
         return create_empty_array(population_size, genome_length)
     storage.create_empty_memmap(population_size, genome_length)
-    return storage.load_population_memmap(open_mode="r+")
+    return storage.load_memmap(filename=storage.population_name(), open_mode="r+")
 
 
 def _binary_array(
@@ -89,7 +89,9 @@ def _binary_memmap(
         population_size=population_size,
         genome_length=genome_length,
     )
-    initial_population = storage.load_population_memmap(open_mode="w+")
+    initial_population = storage.load_memmap(
+        filename=storage.population_name(), open_mode="w+"
+    )
     _fill_initial_population(
         initial_population=initial_population,
         population_size=population_size,

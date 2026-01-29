@@ -3,6 +3,8 @@
 import csv
 from pathlib import Path
 
+import numpy as np
+
 from src.ga_core.config.experiment_config import ExperimentConfig
 from src.ga_core.config.input_config_scheme import EncodingType
 from src.ga_core.engine.evolution_engine import EvolutionEngine, GenerationStats
@@ -45,7 +47,7 @@ class SimpleStorageLayout:
         return self._plots
 
 
-def main():
+def main() -> None:
     """Run genetic algorithm from config.yaml."""
     # Load config
     config_path = Path("config.yaml")
@@ -58,7 +60,7 @@ def main():
     # Create runtime config
     config = ExperimentConfig(
         input=input_config,
-        job_id=input_config.experiment.identifier,
+        job_id=input_config.experiment.identifier or "default",
         root_path=Path.cwd(),
     )
 
@@ -77,7 +79,7 @@ def main():
     # Create fitness function wrapper with items data
     from src.ga_core.strategies.binary.fitness_score import fitness_calculation
 
-    def fitness_fn_wrapper(population):
+    def fitness_fn_wrapper(population: np.ndarray) -> np.ndarray:
         return fitness_calculation(
             max_weight=input_config.data.max_weight,
             penalty_factor=config.penalty_multiplier,
@@ -149,7 +151,7 @@ def main():
     csv_writer = csv.writer(csv_file)
     csv_writer.writerow(["iteration", "best_fitness", "best_weight", "avg_fitness"])
 
-    def log_generation(stats: GenerationStats):
+    def log_generation(stats: GenerationStats) -> None:
         """Log generation stats to CSV."""
         csv_writer.writerow(
             [

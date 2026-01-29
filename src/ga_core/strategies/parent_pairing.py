@@ -50,7 +50,7 @@ def best_worst_pairing(
     sorted_indexes = np.lexsort(
         (fitness_arr[parent_pool, 1], -fitness_arr[parent_pool, 0])
     )
-    best = sorted_indexes[: n / 2]
-    worst = sorted_indexes[n / 2 :]
+    best = sorted_indexes[: n // 2]
+    worst = sorted_indexes[n // 2 :]
     pairs = np.column_stack([best, worst[::-1]])
     return pairs

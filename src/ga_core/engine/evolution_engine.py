@@ -4,7 +4,7 @@ This module provides the main execution loop for genetic algorithms,
 orchestrating strategy execution, population management, and state tracking.
 """
 
-from typing import Callable, Optional
+from typing import Any, Callable, Optional, Sequence
 
 import numpy as np
 
@@ -25,7 +25,7 @@ class GenerationStats:
         self,
         iteration: int,
         fitness_array: np.ndarray,
-        parent_indices: list[int],
+        parent_indices: Sequence[int],
     ):
         """Initialize generation statistics.
 
@@ -89,7 +89,7 @@ class EvolutionEngine:
         self,
         population: PopulationType,
         children: PopulationType,
-        **fitness_kwargs,
+        **fitness_kwargs: Any,
     ) -> GenerationStats:
         """Execute one complete generation of evolution.
 
@@ -130,7 +130,7 @@ class EvolutionEngine:
         return stats
 
     def evaluate_initial_population(
-        self, population: PopulationType, **fitness_kwargs
+        self, population: PopulationType, **fitness_kwargs: Any
     ) -> GenerationStats:
         """Evaluate fitness of initial population (generation 0).
 
