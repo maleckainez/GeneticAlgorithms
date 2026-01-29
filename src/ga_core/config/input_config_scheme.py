@@ -23,6 +23,14 @@ class CrossoverType(str, Enum):
     TWO_POINT = "two"
 
 
+class EncodingType(str, Enum):
+    """Genome encoding strategies."""
+
+    BINARY = "binary"
+    # Future: PERMUTATION = "permutation"
+    # Future: REAL_VALUED = "real"
+
+
 class LogLevel(str, Enum):
     """Allowed logging levels."""
 

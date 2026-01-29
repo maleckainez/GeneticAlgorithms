@@ -6,10 +6,12 @@ appropriate parent pool based on individuals fitness score.
 
 import numpy as np
 
-from src.classes.ExperimentConfig import ExperimentConfig
 
-
-def roulette_selection(fitness_arr: np.ndarray, config: ExperimentConfig) -> list[int]:
+def roulette_selection(
+    fitness_arr: np.ndarray,
+    population_size: int,
+    rng: np.random.Generator,
+) -> list[int]:
     """Select parents using roulette-wheel (fitness-proportionate) selection.
 
     The first column of ``fitness_arr`` is treated as a fitness value. If the
@@ -19,19 +21,15 @@ def roulette_selection(fitness_arr: np.ndarray, config: ExperimentConfig) -> lis
     values and sampled using the RNG from the experiment configuration.
 
     Args:
-        fitness_arr (np.ndarray): 2D array of shape (population_size, 2) where
+        fitness_arr: 2D array of shape (population_size, 2) where
             column 0 stores fitness and column 1 stores weight.
-        config (ExperimentConfig): Experiment configuration holding the RNG
-            instance and population size.
+        population_size: Number of parents to select.
+        rng: Random number generator instance.
 
     Returns:
-        list[int]: Indices of selected parents (with replacement), of length
-            ``config.population_size``.
+        Indices of selected parents (with replacement), of length
+        ``population_size``.
     """
-    # Defensive guard: ExperimentConfig.__post_init__ guarantees rng is not None.
-    # Marked as no cover because this branch should be unreachable in normal usage.
-    if config.rng is None:  # pragma: no cover
-        raise ValueError("Experiment config was not defined!")
     fitness_array = fitness_arr[:, 0].copy()
     fitness_sum = fitness_array.sum()
     if fitness_sum == 0:
@@ -45,13 +43,15 @@ def roulette_selection(fitness_arr: np.ndarray, config: ExperimentConfig) -> lis
     fitness_proportionate = fitness_array / fitness_sum
     proportionate_cfd = np.cumsum(fitness_proportionate.flatten())
     proportionate_cfd[-1] = 1
-    r = config.rng.random(config.population_size)
+    r = rng.random(population_size)
     return np.searchsorted(proportionate_cfd, r).tolist()
 
 
 def tournament_selection(
     fitness_arr: np.ndarray,
-    config: ExperimentConfig,
+    population_size: int,
+    rng: np.random.Generator,
+    tournament_size: int,
 ) -> list[int]:
     """Select parents using tournament selection.
 
@@ -62,25 +62,20 @@ def tournament_selection(
     secondary criterion via lexicographic ordering.
 
     Args:
-        fitness_arr (np.ndarray): 2D array of shape (population_size, 2) where
+        fitness_arr: 2D array of shape (population_size, 2) where
             column 0 stores fitness and column 1 stores weight.
-        config (ExperimentConfig): Experiment configuration holding the RNG
-            instance and population size.
+        population_size: Number of parents to select.
+        rng: Random number generator instance.
+        tournament_size: Number of individuals in each tournament.
 
     Returns:
-        list[int]: Indices of selected parents (with replacement), of length
-            ``config.population_size``.
+        Indices of selected parents (with replacement), of length
+        ``population_size``.
     """
-    # Defensive guard: ExperimentConfig.__post_init__ guarantees rng is not None.
-    # Marked as no cover because this branch should be unreachable in normal usage.
-    if config.rng is None:  # pragma: no cover
-        raise ValueError("Experiment config was not defined!")
-    tournament_size = 5
-    rng = config.rng
     selected_parents = []
-    for i in range(config.population_size):
+    for i in range(population_size):
         gladiators = rng.choice(
-            config.population_size,
+            len(fitness_arr),
             size=tournament_size,
             replace=False,
         )
@@ -94,37 +89,35 @@ def tournament_selection(
 
 
 def linear_rank_selection(
-    fitness_arr: np.ndarray, config: ExperimentConfig
+    fitness_arr: np.ndarray,
+    population_size: int,
+    rng: np.random.Generator,
+    selection_pressure: float,
 ) -> list[int]:
     """Select parents using linear rank-based selection.
 
     Individuals are sorted and assigned ranks; selection probabilities are then
     computed from these ranks using the linear ranking scheme controlled by
-    the selection pressure parameter ``selection_pressure`` from the config.
-    Higher ranks receive higher selection probability.
+    the selection pressure parameter. Higher ranks receive higher selection
+    probability.
 
     The ranking is obtained via lexicographic sorting of ``fitness_arr``:
     first by the first column, then by the negated second column, which allows
     combining primary and secondary criteria.
 
     Args:
-        fitness_arr (np.ndarray): 2D array of shape (population_size, 2) where
+        fitness_arr: 2D array of shape (population_size, 2) where
             column 0 stores fitness and column 1 stores weight used for
             lexicographic ranking.
-        config (ExperimentConfig): Experiment configuration holding the RNG
-            instance, population size, and the linear selection pressure
-            parameter ``selection_pressure`` (in range [1.0, 2.0]).
+        population_size: Number of parents to select.
+        rng: Random number generator instance.
+        selection_pressure: Linear selection pressure parameter (range [1.0, 2.0]).
 
     Returns:
-        list[int]: Indices of selected parents (with replacement), of length
-            ``config.population_size``.
+        Indices of selected parents (with replacement), of length
+        ``population_size``.
     """
-    # Defensive guard: ExperimentConfig.__post_init__ guarantees rng is not None.
-    # Marked as no cover because this branch should be unreachable in normal usage.
-    if config.rng is None or config.selection_pressure is None:  # pragma: no cover
-        raise ValueError("Experiment config was not defined!")
-    rng = config.rng
-    SP = config.selection_pressure
+    SP = selection_pressure
     sorted_idx = np.lexsort((-fitness_arr[:, 1], fitness_arr[:, 0]))
     ranks = np.zeros(shape=fitness_arr.shape[0], dtype=np.int64)
     n = len(fitness_arr)
@@ -134,7 +127,7 @@ def linear_rank_selection(
     probability_distribution = probability_distribution / probability_distribution.sum()
     parent_arr = rng.choice(
         np.arange(n),
-        config.population_size,
+        population_size,
         replace=True,
         p=probability_distribution,
     )
