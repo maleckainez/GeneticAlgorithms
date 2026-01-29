@@ -4,14 +4,18 @@ This module provides the main execution loop for genetic algorithms,
 orchestrating strategy execution, population management, and state tracking.
 """
 
-from typing import Optional
+from typing import Callable, Optional
 
 import numpy as np
 
 from src.ga_core.config.experiment_config import ExperimentConfig
+from src.ga_core.engine.population.manager import PopulationManager
 from src.ga_core.engine.population.types import PopulationType
 from src.ga_core.engine.strategies import StrategyExecutor
 from src.ga_core.engine.timer import Timer
+
+# Type alias for generation callback
+GenerationCallback = Callable[["GenerationStats"], None]
 
 
 class GenerationStats:
@@ -63,6 +67,7 @@ class EvolutionEngine:
         self,
         strategy_executor: StrategyExecutor,
         config: ExperimentConfig,
+        population_manager: PopulationManager,
         rng: Optional[np.random.Generator] = None,
     ):
         """Initialize evolution engine.
@@ -70,10 +75,12 @@ class EvolutionEngine:
         Args:
             strategy_executor: Configured strategy executor.
             config: Experiment configuration.
+            population_manager: Population and children buffer manager.
             rng: Random number generator (default: create from config seed).
         """
         self.strategy_executor = strategy_executor
         self.config = config
+        self.pop_manager = population_manager
         self.rng = rng if rng is not None else config.create_rng()
         self.timer = Timer(config_like=config, logger=None)
         self.current_generation = 0
@@ -96,6 +103,9 @@ class EvolutionEngine:
         """
         self.current_generation += 1
 
+        # Start timer for this generation
+        self.timer.start(self.current_generation)
+
         # Execute strategy pipeline
         parent_indices, fitness_array = self.strategy_executor.execute_generation(
             population=population,
@@ -104,12 +114,18 @@ class EvolutionEngine:
             **fitness_kwargs,
         )
 
+        # Swap children into population (atomic operation)
+        self.pop_manager.commit_reproduction_of_population()
+
         # Create stats
         stats = GenerationStats(
             iteration=self.current_generation,
             fitness_array=fitness_array,
             parent_indices=parent_indices,
         )
+
+        # Stop timer for this generation
+        self.timer.stop(self.current_generation)
 
         return stats
 
@@ -141,6 +157,7 @@ class EvolutionEngine:
         children: PopulationType,
         generations: int,
         fitness_kwargs: Optional[dict] = None,
+        on_generation: Optional[GenerationCallback] = None,
     ) -> list[GenerationStats]:
         """Run complete evolution for specified number of generations.
 
@@ -149,6 +166,7 @@ class EvolutionEngine:
             children: Buffer for offspring.
             generations: Number of generations to run.
             fitness_kwargs: Additional arguments for fitness evaluation.
+            on_generation: Optional callback invoked after each generation with stats.
 
         Returns:
             List of statistics for each generation.
@@ -162,14 +180,27 @@ class EvolutionEngine:
         initial_stats = self.evaluate_initial_population(population, **fitness_kwargs)
         all_stats.append(initial_stats)
 
+        # Invoke callback for generation 0
+        if on_generation is not None:
+            on_generation(initial_stats)
+
         # Run generations
         for gen in range(generations):
             stats = self.run_generation(population, children, **fitness_kwargs)
             all_stats.append(stats)
 
-            # Swap populations (children become new population)
-            # NOTE: In real implementation, this would be handled by PopulationManager
-            # For now, assume caller handles the swap
-            pass
+            # Invoke callback after each generation
+            if on_generation is not None:
+                on_generation(stats)
 
         return all_stats
+
+    def finalize(self) -> None:
+        """Cleanup resources after evolution completes.
+
+        This method should be called after evolution finishes to ensure
+        all temporary files and resources are properly cleaned up.
+        """
+        # Cleanup population manager resources (temp files, memmaps)
+        if hasattr(self.pop_manager, "cleanup"):
+            self.pop_manager.cleanup()

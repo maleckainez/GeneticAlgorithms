@@ -1,6 +1,7 @@
 """Factory for creating strategy executors from configuration."""
 
-from src.ga_core.config.experiment_config import EncodingType, ExperimentConfig
+from src.ga_core.config.experiment_config import ExperimentConfig
+from src.ga_core.config.input_config_scheme import EncodingType
 from src.ga_core.engine.strategies.executor import StrategyExecutor
 from src.ga_core.strategies.factory import (
     create_fitness_fn,
