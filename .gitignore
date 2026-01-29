@@ -15,6 +15,7 @@
 *.json
 run_output
 *.png
+*/output/
 build/
 *.egg-info/
 .dev_notes/
