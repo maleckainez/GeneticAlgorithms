@@ -3,8 +3,7 @@
 import uuid
 
 from fastapi import HTTPException
-from src.api.schemas import JobStatus
-from src.config.schemas import JobConfig
+from src.config.schemas import JobConfig, JobStatus
 
 jobs = {}
 
