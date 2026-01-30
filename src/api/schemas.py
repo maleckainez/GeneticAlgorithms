@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel
 
-from src.config.schemas import JobStatus
+from src.api.config import JobStatus
 
 
 class JobStatusResponse(BaseModel):
