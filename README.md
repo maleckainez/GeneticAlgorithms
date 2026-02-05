@@ -28,7 +28,7 @@ This repository contains:
 ### Library Only (for use in your code)
 
 ```bash
-pip install genetic-algorithms
+pip install ga-knapsack-toolkit
 ```
 
 ### Full Development Setup
@@ -50,7 +50,7 @@ pip install -e ".[dev,api]"
 - Base: `pip install .` – Core library only
 - `.[api]` – Include FastAPI dependencies
 - `.[dev]` – Include testing & linting tools
-- `.[all]` - Install all dependencies and tools
+- `.[dev,api]` - Install all dependencies and tools
 ---
 
 ## Library Usage (`ga_core`)

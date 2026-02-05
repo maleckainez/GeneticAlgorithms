@@ -56,7 +56,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["src.ga_core*"]
+include = ["src/ga_core*"]
 
 [tool.black]
 line-length = 88
