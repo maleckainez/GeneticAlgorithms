@@ -123,7 +123,7 @@ experiment:
 
 ```bash
 # Development mode
-fastapi dev src/api/main.py
+fastapi dev src/api/main.py --reload --reload-dir src/
 
 # Production mode
 fastapi run src/api/main.py
