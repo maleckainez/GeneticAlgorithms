@@ -23,7 +23,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Python Project
-        uses: ./.github/actions/setup-python.yml
+        uses: ./.github/actions/setup-python
         with:
           python-version: ${{ inputs.python-version || '3.10' }}
           install-dev: "true"
