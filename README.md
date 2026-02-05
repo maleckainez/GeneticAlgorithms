@@ -1,12 +1,16 @@
 ![GitHub Tag](https://img.shields.io/github/v/tag/maleckainez/GeneticAlgorithms?include_prereleases)
 
+# Genetic Algorithms for Knapsack
+
+Educational genetic algorithm toolkit with a FastAPI service for running knapsack optimization experiments.
+
 [![Build Status](https://github.com/maleckainez/GeneticAlgorithms/actions/workflows/ci.yml/badge.svg)](https://github.com/maleckainez/GeneticAlgorithms/actions/workflows/ci.yml)
 ![Endpoint Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmaleckainez%2FGeneticAlgorithms%2Frefs%2Fheads%2Fcoverage_score%2F.github%2Fcoverage.json&cacheSeconds=300)
 [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-A Python library and web API for genetic algorithm experiments on optimization problems, primarily focused on knapsack problem benchmarks.
+This project provides a core GA library (`ga_core`) and a FastAPI service for running and tracking experiments on knapsack benchmarks.
 
 ## Project Structure
 
@@ -24,7 +28,7 @@ This repository contains:
 ### Library Only (for use in your code)
 
 ```bash
-pip install genetic-algorithms
+pip install ga-knapsack-toolkit
 ```
 
 ### Full Development Setup
@@ -46,7 +50,7 @@ pip install -e ".[dev,api]"
 - Base: `pip install .` – Core library only
 - `.[api]` – Include FastAPI dependencies
 - `.[dev]` – Include testing & linting tools
-- `.[all]` - Install all dependencies and tools
+- `.[dev,api]` - Install all dependencies and tools
 ---
 
 ## Library Usage (`ga_core`)
