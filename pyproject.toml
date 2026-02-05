@@ -8,16 +8,16 @@ pythonpath = ["src"]
 addopts = ["-v"]
 
 [project]
-name = "genetic-algorithms"
-version = "0.1.0"
-description = "Genetic algorithm library for optimization problems (knapsack, etc.)"
+name = "ga-knapsack-toolkit"
+version = "3.0.0"
+description = "Educational genetic algorithm library for knapsack optimization problems."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
   { name = "Inez Małecka", email = "maleckainez@gmail.com" },
 ]
-keywords = ["genetic algorithm", "knapsack", "optimization"]
+keywords = ["genetic algorithm", "knapsack", "optimization", "evolutionary computation"]
 classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.10",

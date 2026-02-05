@@ -22,7 +22,58 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  tests_pr:
+  # Job 1: Lint only ga_core library
+  lint-library:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python Project
+        uses: ./.github/actions/setup-python.yml
+        with:
+          python-version: "3.10"
+          install-dev: "true"
+          install-api: "false"
+
+      - name: Black (check only)
+        run: black --check src/ga_core tests
+
+      - name: Ruff (linter check)
+        run: ruff check src/ga_core tests
+
+      - name: MyPy check
+        run: |
+          python3 -m pip install types-PyYAML pandas-stubs types-psutil
+          mypy src/ga_core
+
+  # Job 2: Lint API
+  lint-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python Project
+        uses: ./.github/actions/setup-python.yml
+        with:
+          python-version: "3.10"
+          install-dev: "true"
+          install-api: "true"
+
+      - name: Black (check only)
+        run: black --check src/api
+
+      - name: Ruff (linter check)
+        run: ruff check src/api
+
+      - name: MyPy check
+        run: mypy src/api
+
+  # Job 3: Pytest (all modules)
+  tests:
     if: github.event_name == 'pull_request'
     strategy:
       matrix:
@@ -42,25 +93,13 @@ jobs:
           install-dev: "true"
           install-api: "false"
 
-      - name: Black (check only)
-        run: black --check .
-
-      - name: Ruff (linter check)
-        run: ruff check .
-
-      - name: MyPy check
-        run: |
-          python3 -m pip install types-PyYAML
-          python3 -m pip install pandas-stubs
-          python3 -m pip install types-psutil
-          mypy src
-
       - name: Pytest
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: pytest
 
-  tests_push:
+  # Job 4: (On push test multiple platforms)
+  tests-multiplatform:
     if: github.event_name == 'push'
     strategy:
       matrix:
@@ -85,6 +124,7 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}
         run: pytest
 
+  # Job 5: Calculate coverage on push
   coverage:
     if: github.event_name == 'push'
     uses: ./.github/workflows/coverage.yml
