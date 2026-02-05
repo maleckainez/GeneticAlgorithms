@@ -1,12 +1,13 @@
 """Postgres job registry for genetic algorithm runs."""
 
 import uuid
-from fastapi import HTTPException
-from src.api.config import JobConfig, JobStatus
 
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
+from src.api.config import JobConfig, JobStatus
 from src.api.db.database import SessionLocal
 from src.api.models.job import Job
+
 
 def submit_job(config: JobConfig) -> str:
     """Register a job and assign an identifier.
@@ -23,9 +24,10 @@ def submit_job(config: JobConfig) -> str:
     db.add(job)
     db.commit()
     db.refresh(job)
+    job_id: str = str(job.job_id)
     db.close()
 
-    return job.job_id
+    return job_id
 
 
 def get_status(job_id: str) -> JobStatus:
@@ -39,7 +41,8 @@ def get_status(job_id: str) -> JobStatus:
     db.close()
     if not job:
         raise HTTPException(status_code=404, detail="This job does not exist!")
-    return job.status
+    job_status: JobStatus = JobStatus(job.status)
+    return job_status
 
 
 def get_job_list(status: JobStatus) -> list:

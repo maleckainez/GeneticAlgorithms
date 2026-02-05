@@ -2,6 +2,7 @@
 
 from fastapi import FastAPI
 
+from src.api.db.init_db import init_db
 from src.api.routers import backend
 
 app = FastAPI(
@@ -11,6 +12,12 @@ app = FastAPI(
 )
 
 app.include_router(backend.router)
+
+
+@app.on_event("startup")
+def on_startup() -> None:
+    """Initialize database tables."""
+    init_db()
 
 
 @app.get("/")
