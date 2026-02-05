@@ -6,208 +6,224 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+A Python library and web API for genetic algorithm experiments on optimization problems, primarily focused on knapsack problem benchmarks.
 
-# Genetic Algorithms – Knapsack Problem
+## Project Structure
 
-Implementation of genetic algorithms for classic knapsack benchmark instances (from the `dane AG 2` dataset).
-The project allows running experiments with different configurations, logging results, and comparing them against known optimal solutions.
+This repository contains:
 
-## Requirements
+- **`src/ga_core/`** – Core genetic algorithm library (publishable to PyPI)
+- **`src/api/`** – FastAPI web service for running GA experiments
+- **`dane AG 2/`** – Benchmark knapsack problem instances
+- **`tests/`** – Test suite
 
-- **Python ≥ 3.10**
-- OS: Windows / Linux / macOS
-- Installed automatically via `pip install .`:
-  - `numpy`
-  - `pandas`
-  - `matplotlib`
-  - `PyYAML`
-- Development (optional):
-  - `pytest`
-  - `black`
-  - `pre-commit`
-  - `mypy`
-  - `ruff`
-  - `coverage`
-
+---
 
 ## Installation
 
-These instructions assume that you have Python ≥ 3.10 and `git` installed.
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/maleckainez/GeneticAlgorithms.git
-   cd GeneticAlgorithms
-   ```
-
-3. Create and activate a virtual environment:
-
-    ```bash
-    python -m venv .venv
-    ```
-    ```bash
-    # Windows:
-    .venv\Scripts\activate
-    ```
-    ```bash
-    # Linux/macOS:
-    . .venv/bin/activate
-    ```
-4. Install the project with its dependencies:
-
-   ```bash
-   pip install .
-   ```
-
-
-## Development
-
-This section describes how to set up a full development environment, run tests, and execute linters and type checkers.
-
-### 1. Setup
-
-Install the project in editable mode together with all development tools:
+### Library Only (for use in your code)
 
 ```bash
-# windows and linux
-pip install -e .[dev]
-```
-```bash
-# macos
-pip install -e '.[dev]'
+pip install genetic-algorithms
 ```
 
-Then install pre-commit hooks:
+### Full Development Setup
 
 ```bash
-pre-commit install
+git clone https://github.com/maleckainez/GeneticAlgorithms.git
+cd GeneticAlgorithms
+python -m venv .venv
+# Linux:
+source .venv/bin/activate  
+# Windows: 
+.venv\Scripts\activate
+# MacOS:
+. .venv/bin/activate
+pip install -e ".[dev,api]"
 ```
 
-### 2. Running tests
+**Install options:**
+- Base: `pip install .` – Core library only
+- `.[api]` – Include FastAPI dependencies
+- `.[dev]` – Include testing & linting tools
+- `.[all]` - Install all dependencies and tools
+---
 
-From the project root:
+## Library Usage (`ga_core`)
+
+### Quick Start
+
+```python
+from pathlib import Path
+from src.ga_core import ExperimentConfig, InputConfig, ExperimentStorage
+from src.ga_core.engine import EvolutionEngine
+from src.ga_core.io import load_yaml_config, load_experiment_data
+
+# Load configuration
+config_path = Path("config.yaml")
+input_config = load_yaml_config(config_path)
+
+# Load knapsack data
+data_path = Path("dane AG 2/low-dimensional/f1_l-d_kp_10_269")
+items_data = load_experiment_data(data_path)
+
+# Create experiment config
+config = ExperimentConfig(
+    input=input_config,
+    job_id="experiment-001",
+    root_path=Path.cwd()
+)
+
+# Setup storage
+from src.ga_core.storage import SimpleStorageLayout
+layout = SimpleStorageLayout(root=config.root_path)
+storage = ExperimentStorage(layout=layout, job_id=config.job_id)
+
+# Run evolution
+engine = EvolutionEngine(config=config, storage=storage, items_data=items_data)
+engine.run()
+```
+
+### Configuration (`config.yaml`)
+
+```yaml
+data:
+  data_filename: "f1_l-d_kp_10_269"
+  max_weight: 269
+
+population:
+  size: 100
+  generations: 500
+  stream_batch_size: 50
+  commit_mode: "swap"  # or "copy"
+
+selection:
+  type: "roulette"  # roulette, tournament, linear_rank
+  selection_pressure: null  # for rank selection: 1.0-2.0
+  tournament_size: null     # for tournament: int
+
+genetic_operators:
+  crossover_type: "two_point"  # one_point, two_point
+  crossover_probability: 0.75
+  mutation_probability: 0.01
+  penalty_multiplier: 1.0
+  strict_weight_constraints: false
+
+experiment:
+  seed: 42
+  identifier: "exp-001"
+  log_level: "INFO"
+```
+
+---
+
+## Web API
+
+### Running the API
+
+```bash
+# Development mode
+fastapi dev src/api/main.py --reload --reload-dir src/
+
+# Production mode
+fastapi run src/api/main.py
+```
+
+API will be available at:
+-  http://localhost:8000
+
+API Docs at:
+-  http://localhost:8000/docs
+
+### API Endpoints
+
+**Health Check**
+```bash
+GET /health
+```
+
+**Submit GA Job**
+```bash
+POST /backend/run/ga
+Content-Type: application/json
+
+{
+  "data": {"data_filename": "f1_l-d_kp_10_269", "max_weight": 269},
+  "population": {"size": 100, "generations": 500, ...},
+  ...
+}
+
+Response: {"job_id": "job-uuid", "status": "pending"}
+```
+
+**Check Job Status**
+```bash
+GET /backend/status/{job_id}
+
+Response: {"job_id": "uuid", "status": "running"}
+```
+
+**List Jobs by Status**
+```bash
+GET /backend/jobs/finished
+
+Response: {"status": "finished", "jobs": ["uuid1", "uuid2", ...]}
+```
+
+---
+
+## 🧪 Development
+
+### Running Tests
 
 ```bash
 pytest
 ```
 
-### 3. Running linters and type checks
-
-Code style and static analysis:
+### Code Quality
 
 ```bash
-ruff check src tests
-black --check src tests
-mypy src
+# Format code
+black .
+
+# Lint
+ruff check .
+
+# Type check
+mypy .
 ```
 
-### 4. Test coverage
-
-To measure code coverage:
+### Test Coverage
 
 ```bash
 coverage run -m pytest
 coverage report
 ```
 
+---
 
-## Dataset: `dane AG 2`
+## 📊 Dataset: `dane AG 2`
 
-The project uses knapsack benchmark instances located in:
+The repository includes benchmark knapsack problem instances:
 
 ```
 dane AG 2/
-├── large_scale/               # large knapsack instances (knapPI_...)
-├── large_scale-optimum/       # optimum values for large_scale
-├── low-dimensional/           # smaller instances (f...)
-└── low-dimensional-optimum/   # optimum values for low-dimensional
+├── large_scale/               # Large instances (knapPI_*)
+├── large_scale-optimum/       # Known optimal values
+├── low-dimensional/           # Smaller instances (f*)
+└── low-dimensional-optimum/   # Known optimal values
 ```
 
-The `PathResolver` module (`src/classes/PathResolver.py`) assumes:
+**File format:** Each line contains `value weight`
 
-- files starting with **`knap`** are stored in `dane AG 2/large_scale`
-- files starting with **`f`** are stored in `dane AG 2/low-dimensional`
-
-If you use your own dataset, it must:
-
-- contain two integers per line (`value weight`)
-- follow the same folder structure; or
-- require modification of `PathResolver`.
-
-## Configuration (`config.yaml`)
-
-All experiment parameters are defined in `config.yaml` in the repository root.
-
-Example:
-
-```yaml
-data:
-  filename: "knapPI_1_10000_1000_1"
-  max_weight: 1000
-
-population:
-  size: 10000
-  generations: 4000
-  stream_batch_size: 500
-
-selection:
-  type: "roulette"       # [roulette, tournament, rank]
-  selection_pressure: 2  # only for rank (1–2)
-
-genetic_operators:
-  crossover_type: "two"         # [one, two]
-  crossover_probability: 0.75   # 0–1
-  mutation_probability: 0.0002  # 0–1
-  penalty_multiplier: 1         #penalty for exceeding max weight; 0 is a special value that sets fitness to 0 for overweight individuals, any other value acts as a penalty multiplier
-
-experiment:
-  seed: 2137                    # RNG seed (for reproducibility)
-  identifier: 1                 # experiment ID (used in file names)
-  log_level: INFO               # [DEBUG, INFO, WARNING, ERROR, CRITICAL]
-```
-
-### Key fields for reproducibility
-
-- **`experiment.seed`** – controls randomness
-  Same seed ⇒ same random sequence (assuming identical code and library versions).
-- **`data.filename`** – selects which knapsack instance is used.
-- **`population.*`, `selection.*`, `genetic_operators.*`** – must match exactly to reproduce a specific experiment.
-
-## Running Experiments
-
-From the repository root (where `pyproject.toml` and `config.yaml` are located):
-
-```bash
-python -m src
-```
-
-The script:
-
-- loads configuration from `config.yaml`
-- creates:
-  - `ExperimentConfig`
-  - `PathResolver`
-  - `EvolutionRunner`
-- runs the evolutionary process
-- saves output to:
-
-```
-run_output/<experiment-name>/
-├── logs/
-├── output/
-└── plots/
-```
-
-The plot `best_fitness_v_optimal.png` compares the best fitness found by the GA with the known optimal value.
-
-Experiment naming and output directory structure are defined in:
-
-- `src/methods/experiment_defining_tools.py`
-- `src/classes/PathResolver.py`
+---
+[//]: <> ( ## Docker & Docker Compose)
+[//]: <> ()
+[//]: <> (Coming soon! The project will support:)
+[//]: <> (- Multi-stage Docker build)
+[//]: <> (- Docker Compose with API + PostgreSQL)
+[//]: <> (- Automated CI/CD with Docker image publishing)
 
 
-## License
-
-> This project is available under the MIT License.
+ Author: **Inez Małecka** – [maleckainez@gmail.com](mailto:maleckainez@gmail.com)
 
